@@ -273,28 +273,25 @@ public class CodeGeneratorTest extends TestCase {
 
     public void testAppend() {
         String text = "module MyList where {" +
-            "{-# NATIVE data ([]) a \"jaskell.runtime.types.JList\" #-};" +
-            "{-# NATIVE ([]) = (:) a [a] \"jaskell.runtime.types.ConsList\" #-};" +
-            "{-# NATIVE ([]) = ([]) \"jaskell.runtime.types.NilList\" #-};" +
+            "{-# NATIVE data ([]) a \"fr.lifl.jaskell.runtime.types.JList\" #-};" +
+            "{-# NATIVE ([]) = (:) a [a] \"fr.lifl.jaskell.runtime.types._3a\" #-};" +
+            "{-# NATIVE ([]) = ([]) \"fr.lifl.jaskell.runtime.types._5b_5d\" #-};" +
             "addHead x [] = [x]; addHead x xs = x:xs}";
         StringReader sr = new StringReader(text);
-        Yyparser p = new Yyparser(true);
+        Yyparser p = new Yyparser();
         p.parse(sr);
         Module m = (Module) Module.getToplevels().get("MyList");
-        System.out.println(m);
         /* typecheck module */
         LambdaLifter ll = new LambdaLifter(m);
         m.visit(ll);
         StrictnessAnalyzer sal = new StrictnessAnalyzer();
         TypeChecker tc = new TypeChecker();
         CodeGenerator gen = new CodeGenerator();
-        System.out.println(m);
         m.visit(sal);
         m.visit(tc);
         m.visit(gen);
         ClassFileWriter writer = new ClassFileWriter("bin");
         BytecodeGenerator.cleanupClassFiles(writer);
-        Type2Class.cleanupClassFiles(writer);
         System.out.println(m);
     }
 

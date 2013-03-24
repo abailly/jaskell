@@ -9,6 +9,7 @@ package fr.lifl.jaskell.compiler;
 import java.lang.reflect.Method;
 
 import fr.lifl.jaskell.compiler.bytecode.BytecodeGenerator;
+import fr.lifl.jaskell.compiler.bytecode.ClassFileWriter;
 import fr.lifl.jaskell.compiler.bytecode.CodeGenerator;
 import fr.lifl.jaskell.compiler.bytecode.Type2Class;
 import fr.lifl.jaskell.compiler.core.Abstraction;
@@ -114,9 +115,9 @@ public class CompilerTest extends TestCase {
         assertNotNull(met);
         Object obj = met.invoke(null, null);
         Class<?> facClass = obj.getClass();
-        met = facClass.getMethod("eval", new Class[]{int.class, int.class});
+        met = facClass.getMethod("eval", new Class[]{int.class});
         obj = met.invoke(obj, new Object[] { new Integer(4) });
-        assertEquals(20, ((Integer) obj).intValue());
+        assertEquals(24, ((Integer) obj).intValue());
     }
 
 }

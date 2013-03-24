@@ -65,6 +65,16 @@ public class BytecodeGenerator extends CompilerPass implements Opcodes {
         }
     }
 
+    public static synchronized void handleGeneratedClasses(ClassFileHandler cfh) {
+        Iterator it = generatedClass.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            String name = (String) entry.getKey();
+            ClassFile cf = (ClassFile) entry.getValue();
+            cfh.handle(name, cf);
+        }
+    }
+
     public static ClassLoader getLoader() {
         return loader;
     }
