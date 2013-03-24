@@ -1,264 +1,268 @@
+/**
+ *  Copyright Murex S.A.S., 2003-2013. All Rights Reserved.
+ * 
+ *  This software program is proprietary and confidential to Murex S.A.S and its affiliates ("Murex") and, without limiting the generality of the foregoing reservation of rights, shall not be accessed, used, reproduced or distributed without the
+ *  express prior written consent of Murex and subject to the applicable Murex licensing terms. Any modification or removal of this copyright notice is expressly prohibited.
+ */
 package fr.lifl.jaskell.compiler.core;
+
+import java.util.*;
 
 import fr.lifl.jaskell.compiler.JaskellVisitor;
 import fr.lifl.jaskell.compiler.types.Type;
 import fr.lifl.jaskell.compiler.types.TypeFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * A class representing lambda expressions.
- * 
- * An abstraction  is used to define functions and bind variables. It is
- * assumed that every abstraction is defined at the module level and 
- * may not be nested inside another abstraction. This means that abstraction
- * namespace is flat. 
- * 
- * @author bailly
+ * A class representing lambda expressions. An abstraction is used to define functions and bind variables. It is assumed
+ * that every abstraction is defined at the module level and may not be nested inside another abstraction. This means
+ * that abstraction namespace is flat.
+ *
+ * @author  bailly
  * @version $Id: Abstraction.java 1154 2005-11-24 21:43:37Z nono $
- *  */
+ */
 public class Abstraction extends ExpressionBase implements Binder {
 
-	private short maxlocals;
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Instance fields 
+    //~ ----------------------------------------------------------------------------------------------------------------
 
-	/** map of bindings in this abstraction */
-	private Map bindings = new LinkedHashMap();
+    private short maxlocals;
 
-	/** indexed list of bindings */
-	private List indices = new ArrayList();
+    /** map of bindings in this abstraction */
+    private Map bindings = new LinkedHashMap();
 
-	/** body of this abstraction */
-	private Expression body;
+    /** indexed list of bindings */
+    private List indices = new ArrayList();
 
-	/** count of bindings in this abstraction */
-	private int count = 0;
+    /** body of this abstraction */
+    private Expression body;
 
-	/** Name of class file where this abstraction is compiled to */
-	private String className;
+    /** count of bindings in this abstraction */
+    private int count = 0;
 
-	/**
-	 * Adds a new binding to this Abstraction. This method sets the 
-	 * index of the binding object and returns it
-	 * 
-	 * @param bind a LocalBinding object
-	 * @return index of this binding object
-	 */
-	public int bind(LocalBinding bind) {
-		Object b = bindings.get(bind.getName());
-		if (b != null)
-			throw new IllegalArgumentException(
-				"Variable "
-					+ bind.getName()
-					+ " is already bound in Abstraction "
-					+ this);
-		bindings.put(bind.getName(), bind);
-		/* update index */
-		bind.setIndex(count);
-		indices.add(count, bind);
-		bind.setParent(this);
-		maxlocals++;
-		return count++;
-	}
+    /** Name of class file where this abstraction is compiled to */
+    private String className;
 
-	/** 
-	 * Retrieves binding for a given index
-	 * 
-	 * @param i the index of binding to retrieve
-	 * @return a LocalBinding object or null if no binding is defined
-	 * at that index
-	 */
-	public LocalBinding getByIndex(int i) {
-		return (LocalBinding) indices.get(i);
-	}
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Methods 
+    //~ ----------------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Retrieves bindings for a given declaration name
-	 * 
-	 * @param name the name of the variable
-	 * @return a LocalBinding object or null if no binding is defined
-	 */
-	public LocalBinding getByName(String name) {
-		return (LocalBinding) bindings.get(name);
-	}
-	/**
-	 * @see jaskell.compiler.core.Expression#visit(JaskellVisitor)
-	 */
-	public Object visit(JaskellVisitor v) {
-		return v.visit(this);
-	}
+    /**
+     * Adds a new binding to this Abstraction. This method sets the index of the binding object and returns it
+     *
+     * @param  bind a LocalBinding object
+     *
+     * @return index of this binding object
+     */
+    public int bind(LocalBinding bind) {
+        Object b = bindings.get(bind.getName());
+        if (b != null)
+            throw new IllegalArgumentException("Variable " +
+                bind.getName() +
+                " is already bound in Abstraction " + this);
+        bindings.put(bind.getName(), bind);
+        /* update index */
+        bind.setIndex(count);
+        indices.add(count, bind);
+        bind.setParent(this);
+        maxlocals++;
+        return count++;
+    }
 
-	/**
-	 * Returns the body.
-	 * @return Expression
-	 */
-	public Expression getBody() {
-		return body;
-	}
+    /**
+     * Retrieves binding for a given index
+     *
+     * @param  i the index of binding to retrieve
+     *
+     * @return a LocalBinding object or null if no binding is defined at that index
+     */
+    public LocalBinding getByIndex(int i) {
+        return (LocalBinding) indices.get(i);
+    }
 
-	/**
-	 * Sets the body.
-	 * @param body The body to set
-	 */
-	public void setBody(Expression body) {
-		this.body = body;
-		body.setParent(this);
-	}
+    /**
+     * Retrieves bindings for a given declaration name
+     *
+     * @param  name the name of the variable
+     *
+     * @return a LocalBinding object or null if no binding is defined
+     */
+    public LocalBinding getByName(String name) {
+        return (LocalBinding) bindings.get(name);
+    }
 
-	/**
-	 * Returns the bindings.
-	 * @return Map
-	 */
-	public Map getBindings() {
-		return bindings;
-	}
+    /**
+     * @see jaskell.compiler.core.Expression#visit(JaskellVisitor)
+     */
+    public Object visit(JaskellVisitor v) {
+        return v.visit(this);
+    }
 
-	/**
-	 * Returns the count.
-	 * @return int
-	 */
-	public int getCount() {
-		return count;
-	}
+    /**
+     * Returns the body.
+     *
+     * @return Expression
+     */
+    public Expression getBody() {
+        return body;
+    }
 
-	/**
-	 * Computes the type of this expression from the type 
-	 * of its bindings and body. getType does not verify the 
-	 * validity of the computed type.
-	 * 
-	 * @see jaskell.compiler.core.Expression#getType()
-	 */
-	public Type getType() {
-		Type type;
-		// return precalculated type if available
-		if ((type =super.getType()) != null)
-			return type;
-		type = body.getType();
-		if (type == null)
-			return null;
-		LocalBinding[] binds =
-			(LocalBinding[]) indices.toArray(new LocalBinding[0]);
-		for (int i = binds.length; i > 0; i--)
-			type =
-		TypeFactory.makeApplication(
-		TypeFactory.makeApplication(
-						Primitives.FUNCTION,
-						binds[i - 1].getType()),
-					type);
-		setType(type);
-		return type;
-	}
+    /**
+     * Sets the body.
+     *
+     * @param body The body to set
+     */
+    public void setBody(Expression body) {
+        this.body = body;
+        body.setParent(this);
+    }
 
+    /**
+     * Returns the bindings.
+     *
+     * @return Map
+     */
+    public Map getBindings() {
+        return bindings;
+    }
 
-	/**
-	 * Method resolve.
-	 * @param vname
-	 * @return Binding
-	 */
-	public Expression lookup(String vname) {
-		LocalBinding bind = getByName(vname);
-		if (bind == null) { // try module
-			Expression parent = getParent();
-			if (parent != null)
-				return parent.lookup(vname);
-		}
-		return bind;
-	}
+    /**
+     * Returns the count.
+     *
+     * @return int
+     */
+    public int getCount() {
+        return count;
+    }
 
+    /**
+     * Computes the type of this expression from the type of its bindings and body. getType does not verify the validity
+     * of the computed type.
+     *
+     * @see jaskell.compiler.core.Expression#getType()
+     */
+    public Type getType() {
+        Type type;
+        // return precalculated type if available
+        if ((type = super.getType()) != null)
+            return type;
+        type = body.getType();
+        if (type == null)
+            return null;
+        LocalBinding[] binds = (LocalBinding[]) indices.toArray(new LocalBinding[0]);
+        for (int i = binds.length; i > 0; i--)
+            type = TypeFactory.makeApplication(TypeFactory.makeApplication(Primitives.FUNCTION, binds[i - 1].getType()), type);
+        setType(type);
+        return type;
+    }
 
-	/**
-	 * Method setStrict.
-	 * 
-	 * Sets the given variable name to strict
-	 * @param s
-	 */
-	public void setStrict(String s) {
-		LocalBinding b = (LocalBinding) bindings.get(s);
-		b.setStrict(true);
-	}
+    /**
+     * Method resolve.
+     *
+     * @param  vname
+     *
+     * @return Binding
+     */
+    public Expression lookup(String vname) {
+        LocalBinding bind = getByName(vname);
+        if (bind == null) { // try module
+            Expression parent = getParent();
+            if (parent != null)
+                return parent.lookup(vname);
+        }
+        return bind;
+    }
 
-	/**
-	 * Returns the strictness status of a parameter 
-	 * given by its index
-	 * 
-	 * @param i index of parameter
-	 */
-	public boolean isStrict(int i) {
-		return getByIndex(i).isStrict();
-	}
+    /**
+     * Method setStrict. Sets the given variable name to strict
+     *
+     * @param s
+     */
+    public void setStrict(String s) {
+        LocalBinding b = (LocalBinding) bindings.get(s);
+        b.setStrict(true);
+    }
 
-	/**
-	 * Method setNonStrict.
-	 * @param s
-	 */
-	public void setNonStrict(String s) {
-		LocalBinding b = (LocalBinding) bindings.get(s);
-		b.setStrict(false);
-	}
+    /**
+     * Returns the strictness status of a parameter given by its index
+     *
+     * @param i index of parameter
+     */
+    public boolean isStrict(int i) {
+        return getByIndex(i).isStrict();
+    }
 
-	/**
-	 * Returns the class this abstraction was compiled in
-	 *
-	 * @return an Stirng representing a class name in internal form
-	 */
-	public String getClassName() {
-		return className;
-	}
+    /**
+     * Method setNonStrict.
+     *
+     * @param s
+     */
+    public void setNonStrict(String s) {
+        LocalBinding b = (LocalBinding) bindings.get(s);
+        b.setStrict(false);
+    }
 
-	/**
-	 * Defines the class name where this abstraction is compiled to
-	 *
-	 * @param className internal name for class
-	 */
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    /**
+     * Returns the class this abstraction was compiled in
+     *
+     * @return an Stirng representing a class name in internal form
+     */
+    public String getClassName() {
+        return className;
+    }
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		StringBuffer sb = new StringBuffer("\\");
-		Iterator it = indices.iterator();
-		while (it.hasNext())
-			sb.append(' ').append(it.next());
-		sb.append(" -> ").append(body);
-		return sb.toString();
+    /**
+     * Defines the class name where this abstraction is compiled to
+     *
+     * @param className internal name for class
+     */
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	}
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer("\\");
+        Iterator it = indices.iterator();
+        while (it.hasNext())
+            sb.append(' ').append(it.next());
+        sb.append(" -> ").append(body);
+        return sb.toString();
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() throws CloneNotSupportedException {
-		Abstraction abs = new Abstraction();
-		Iterator it = getBindings().values().iterator();
-		while (it.hasNext()) {
-			LocalBinding lb = (LocalBinding) it.next();
-			abs.bind(lb);
-		}
-		abs.setBody((Expression) ((ExpressionBase)body).clone());
-		abs.setType(getType());
-		abs.setClassName(getClassName());
-		abs.setParent(getParent());
-		return abs;
-	}
+    }
 
-	/**
-	 * @return
-	 */
-	public short getMaxLocals() {
-		return maxlocals;
-	}
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    public Object clone() throws CloneNotSupportedException {
+        Abstraction abs = new Abstraction();
+        Iterator it = getBindings().values().iterator();
+        while (it.hasNext()) {
+            LocalBinding lb = (LocalBinding) it.next();
+            abs.bind(lb);
+        }
+        abs.setBody((Expression) ((ExpressionBase) body).clone());
+        abs.setType(getType());
+        abs.setClassName(getClassName());
+        abs.setParent(getParent());
+        return abs;
+    }
 
-	/**
-	 * @param s
-	 */
-	public void setMaxlocals(short s) {
-		maxlocals = s;
-	}
+    /**
+     * @return
+     */
+    public short getMaxLocals() {
+        return maxlocals;
+    }
+
+    /**
+     * @param s
+     */
+    public void setMaxlocals(short s) {
+        maxlocals = s;
+    }
 
 }

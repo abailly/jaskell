@@ -1,393 +1,365 @@
-/*
- * Created on Jun 18, 2003
- * Copyright 2003 Arnaud Bailly
- * $Log: StrictnessInterpreter.java,v $
- * Revision 1.6  2004/09/07 10:04:04  bailly
- * cleared imports
- *
- * Revision 1.5  2004/07/01 15:57:41  bailly
- * suppression de l'interface Namespace au profit de fr.lifl.parsing.Namespace
- * modification de la g?n?ration de code pour les constructeurs et les types de donnees
- * creation d'un type JEvent et d'un constructeur Event
- * modification du parser pour creer des Event lors de l'analyse syntaxique
- *
- * Revision 1.4  2004/02/19 14:55:01  nono
- * Integrated jaskell to FIDL
- * Added rules in grammar to handle messages
- *
- * Revision 1.3  2003/06/27 06:24:52  bailly
- * *** empty log message ***
- *
- * Revision 1.2  2003/06/23 06:33:31  bailly
- * Debugging
- * Added JError primitive type to raise runtime exceptions
- * when no match is found
- *
- * Revision 1.1  2003/06/18 19:59:16  bailly
- * Added abstractInterpreter and StrictnessInterpreter classes
- * to compute strictness information both for arguments
- * and  internal nodes - applications of combinator bodies
- *
+/**
+ *  Copyright Murex S.A.S., 2003-2013. All Rights Reserved.
+ * 
+ *  This software program is proprietary and confidential to Murex S.A.S and its affiliates ("Murex") and, without limiting the generality of the foregoing reservation of rights, shall not be accessed, used, reproduced or distributed without the
+ *  express prior written consent of Murex and subject to the applicable Murex licensing terms. Any modification or removal of this copyright notice is expressly prohibited.
  */
 package fr.lifl.jaskell.compiler;
 
-import fr.lifl.jaskell.compiler.core.Abstraction;
-import fr.lifl.jaskell.compiler.core.Alternative;
-import fr.lifl.jaskell.compiler.core.Binder;
-import fr.lifl.jaskell.compiler.core.BooleanLiteral;
-import fr.lifl.jaskell.compiler.core.CharLiteral;
-import fr.lifl.jaskell.compiler.core.Conditional;
-import fr.lifl.jaskell.compiler.core.Constructor;
-import fr.lifl.jaskell.compiler.core.DoubleLiteral;
-import fr.lifl.jaskell.compiler.core.Expression;
-import fr.lifl.jaskell.compiler.core.FloatLiteral;
-import fr.lifl.jaskell.compiler.core.IntegerLiteral;
-import fr.lifl.jaskell.compiler.core.PrimitiveFunction;
-import fr.lifl.jaskell.compiler.core.QualifiedVariable;
-import fr.lifl.jaskell.compiler.core.StringLiteral;
-import fr.lifl.jaskell.compiler.core.Variable;
+import java.util.*;
+
+import fr.lifl.jaskell.compiler.core.*;
 import fr.lifl.jaskell.compiler.datatypes.ConstructorDefinition;
 import fr.lifl.jaskell.runtime.types.Closure;
 import fr.lifl.jaskell.runtime.types.JFunction;
 import fr.lifl.jaskell.runtime.types.JObject;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import fr.lifl.parsing.Namespace;
 import fr.lifl.parsing.SymbolException;
 
+
 /**
- * @author bailly
+ * @author  bailly
  * @version $Id: StrictnessInterpreter.java 1154 2005-11-24 21:43:37Z nono $
  */
 public class StrictnessInterpreter extends AbstractInterpreter {
 
-  /* current namespace to resolve variables */
-  private Namespace module;
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Static fields/initializers 
+    //~ ----------------------------------------------------------------------------------------------------------------
 
-  /* constant value denoting a terminating computation */
-  private static JObject one = new JObject() {
-    public JObject eval() {
-      return this;
-    }
-  };
+    /* constant value denoting a terminating computation */
+    private static JObject one = new JObject() {
+        public JObject eval() {
+            return this;
+        }
+    };
 
-  /* constant value denoting a divergent computation */
-  private static JObject zero = new JObject() {
-    public JObject eval() {
-      return this;
-    }
-  };
+    /* constant value denoting a divergent computation */
+    private static JObject zero = new JObject() {
+        public JObject eval() {
+            return this;
+        }
+    };
 
-  /* store mapping from abstractions to values */
-  private Map abstractions = new HashMap();
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Instance fields 
+    //~ ----------------------------------------------------------------------------------------------------------------
 
-  /* a function that is strict in all its arguments */
-  class StrictFunction extends Closure {
+    /* current namespace to resolve variables */
+    private Namespace module;
 
-    Binder binder;
+    /* store mapping from abstractions to values */
+    private Map abstractions = new HashMap();
 
-    /**
-     * @param n
-     */
-    public StrictFunction(int n, Binder def) {
-      super(n);
-      this.binder = def;
-    }
+    /* current context for variable resolution - initially empty */
+    private Map context = new HashMap();
+
+    /* stack of contexts */
+    private Stack stack;
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Methods 
+    //~ ----------------------------------------------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
-     * 
-     * @see jaskell.runtime.types.JObject#eval()
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Alternative)
      */
-    public JObject eval() {
-      if (nargs < maxargs)
-        return this;
-      else {
-        for (int i = 0; i < maxargs; i++)
-          if ((args[i] == zero) && binder.isStrict(i))
+    public Object visit(Alternative a) {
+        JObject eval = (JObject) a.getExpression().visit(this);
+        if (eval == zero)
             return zero;
         return one;
-      }
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jaskell.runtime.types.JFunction#init()
-     */
-    public JFunction init() {
-      return new StrictFunction(maxargs, binder);
-    }
-
-  }
-
-  /* standard function */
-  class Combinator extends Closure {
-
-    Abstraction abs;
-
-    StrictnessInterpreter interp;
 
     /**
-     * @param n
+     * Restore context after function return
      */
-    public Combinator(int n, Abstraction abs, StrictnessInterpreter interp) {
-      super(n);
-      this.abs = abs;
-      this.interp = interp;
+    public void popContext() {
+        if (stack.isEmpty())
+            throw new IllegalStateException("Stack underflow");
+        context = (Map) stack.pop();
+    }
+
+    /**
+     * Install a new context - name to values mapping - and save the old one.
+     *
+     * @param vars
+     */
+    public void pushContext(Map vars) {
+        stack.push(context);
+        context = vars;
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see jaskell.runtime.types.JObject#eval()
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.BooleanLiteral)
      */
-    public JObject eval() {
-      if (nargs < maxargs)
-        return this;
-      else {
-        /* gives value to bindings */
-        int i = 0;
-        Map vars = new LinkedHashMap(abs.getBindings());
-        Iterator it = vars.entrySet().iterator();
-        while (it.hasNext()) {
-          Map.Entry entry = (Map.Entry) it.next();
-          entry.setValue(args[i++]);
+    public Object visit(BooleanLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.CharLiteral)
+     */
+    public Object visit(CharLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Conditional)
+     */
+    public Object visit(Conditional a) {
+        /* return zero if condition is zero or both branch of alternatives are zero */
+        JObject obj = (JObject) a.getCondition().visit(this);
+        JObject ift = (JObject) a.getIfTrue().visit(this);
+        JObject iff = (JObject) a.getIfFalse().visit(this);
+        return (obj == zero) ? zero : (((ift == zero) && (iff == zero)) ? zero : one);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.DoubleLiteral)
+     */
+    public Object visit(DoubleLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.FloatLiteral)
+     */
+    public Object visit(FloatLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.IntegerLiteral)
+     */
+    public Object visit(IntegerLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.QualifiedVariable)
+     */
+    public Object visit(QualifiedVariable a) {
+        /* resolve variable */
+        Expression expr = a.lookup(a.getName());
+        return (JObject) expr.visit(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.StringLiteral)
+     */
+    public Object visit(StringLiteral a) {
+        return one;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Variable)
+     */
+    public Object visit(Variable a) {
+        /* try to find variable in current context */
+        JObject obj = (JObject) context.get(a.getName());
+        if (obj != null)
+            return obj;
+        /* explore stack */
+        if (!stack.isEmpty())
+            for (int i = stack.size() - 1; i >= 0; i--) {
+                Map m = (Map) stack.get(i);
+                if ((obj = (JObject) m.get(a.getName())) != null)
+                    return obj;
+            }
+
+        try {
+            /* resolve variable at toplevel */
+            Expression expr = (Expression) module.resolve(a.getName());
+            return (JObject) expr.visit(this);
+        } catch (SymbolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new IllegalStateException("Unresolved variable " + a);
         }
-        interp.pushContext(vars);
-        /* instantiate abs body and call eval on it */
-        JObject val = (JObject) abs.getBody().visit(interp);
-        interp.popContext();
-        return val;
-      }
-
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see jaskell.runtime.types.JFunction#init()
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.PrimitiveFunction)
      */
-    public JFunction init() {
-      return new Combinator(maxargs, abs, interp);
+    public Object visit(PrimitiveFunction a) {
+        /*
+         * primitive functions are always strict - if any argument fails, the
+         * function fail
+         */
+        return new StrictFunction(a.getCount(), a);
     }
 
-  }
-
-  /* current context for variable resolution - initially empty */
-  private Map context = new HashMap();
-
-  /* stack of contexts */
-  private Stack stack;
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Alternative)
-   */
-  public Object visit(Alternative a) {
-    JObject eval = (JObject) a.getExpression().visit(this);
-    if (eval == zero)
-      return zero;
-    return one;
-  }
-
-  /**
-   * Restore context after function return
-   */
-  public void popContext() {
-    if (stack.isEmpty())
-      throw new IllegalStateException("Stack underflow");
-    context = (Map) stack.pop();
-  }
-
-  /**
-   * Install a new context - name to values mapping - and save the old one.
-   * 
-   * @param vars
-   */
-  public void pushContext(Map vars) {
-    stack.push(context);
-    context = vars;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.BooleanLiteral)
-   */
-  public Object visit(BooleanLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.CharLiteral)
-   */
-  public Object visit(CharLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Conditional)
-   */
-  public Object visit(Conditional a) {
-    /* return zero if condition is zero or both branch of alternatives are zero */
-    JObject obj = (JObject) a.getCondition().visit(this);
-    JObject ift = (JObject) a.getIfTrue().visit(this);
-    JObject iff = (JObject) a.getIfFalse().visit(this);
-    return (obj == zero) ? zero : ((ift == zero) && (iff == zero) ? zero : one);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.DoubleLiteral)
-   */
-  public Object visit(DoubleLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.FloatLiteral)
-   */
-  public Object visit(FloatLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.IntegerLiteral)
-   */
-  public Object visit(IntegerLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.QualifiedVariable)
-   */
-  public Object visit(QualifiedVariable a) {
-    /* resolve variable */
-    Expression expr = a.lookup(a.getName());
-    return (JObject) expr.visit(this);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.StringLiteral)
-   */
-  public Object visit(StringLiteral a) {
-    return one;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Variable)
-   */
-  public Object visit(Variable a) {
-    /* try to find variable in current context */
-    JObject obj = (JObject) context.get(a.getName());
-    if (obj != null)
-      return obj;
-    /* explore stack */
-    if (!stack.isEmpty())
-      for (int i = stack.size() - 1; i >= 0; i--) {
-        Map m = (Map) stack.get(i);
-        if ((obj = (JObject) m.get(a.getName())) != null)
-          return obj;
-      }
-
-    try {
-      /* resolve variable at toplevel */
-      Expression expr = (Expression) module.resolve(a.getName());
-      return (JObject) expr.visit(this);
-    } catch (SymbolException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      throw new IllegalStateException("Unresolved variable " + a);
-    }
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.PrimitiveFunction)
-   */
-  public Object visit(PrimitiveFunction a) {
     /*
-     * primitive functions are always strict - if any argument fails, the
-     * function fail
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Abstraction)
      */
-    return new StrictFunction(a.getCount(), a);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Abstraction)
-   */
-  public Object visit(Abstraction a) {
-    JObject cur = (JObject) abstractions.get(a);
-    if (cur == null) {
-      cur = new Combinator(a.getCount(), a, this);
-      abstractions.put(a, cur);
+    public Object visit(Abstraction a) {
+        JObject cur = (JObject) abstractions.get(a);
+        if (cur == null) {
+            cur = new Combinator(a.getCount(), a, this);
+            abstractions.put(a, cur);
+        }
+        return cur;
     }
-    return cur;
-  }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Constructor)
-   */
-  public Object visit(Constructor a) {
-    ConstructorDefinition def;
-    try {
-      def = (ConstructorDefinition) module.resolve(a
-          .getName());
-      return new StrictFunction(def.getParameters().size(), def);
-    } catch (SymbolException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      throw new CompilerException("Unknown constructor " + a.getName());
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Constructor)
+     */
+    public Object visit(Constructor a) {
+        ConstructorDefinition def;
+        try {
+            def = (ConstructorDefinition) module.resolve(a.getName());
+            return new StrictFunction(def.getParameters().size(), def);
+        } catch (SymbolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new CompilerException("Unknown constructor " + a.getName());
+        }
     }
-  }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Module)
-   */
-  public Object visit(Namespace a) {
-    /* set current namespace to module */
-    module = a;
-    /* visit definitions */
-    Iterator it = a.getAllBindings().entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry entry = (Map.Entry) it.next();
-      String functionName = (String) entry.getKey();
-      Expression def = (Expression) entry.getValue();
-      JObject cur, res = null;
-      do {
-        cur = res;
-        res = eval(def);
-      } while (cur != res);
+    /*
+     * (non-Javadoc)
+     *
+     * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Module)
+     */
+    public Object visit(Namespace a) {
+        /* set current namespace to module */
+        module = a;
+        /* visit definitions */
+        Iterator it = a.getAllBindings().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            String functionName = (String) entry.getKey();
+            Expression def = (Expression) entry.getValue();
+            JObject cur, res = null;
+            do {
+                cur = res;
+                res = eval(def);
+            } while (cur != res);
+        }
+        return null;
     }
-    return null;
-  }
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+    //~ Inner Classes 
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /* a function that is strict in all its arguments */
+    class StrictFunction extends Closure {
+
+        Binder binder;
+
+        /**
+         * @param n
+         */
+        public StrictFunction(int n, Binder def) {
+            super(n);
+            this.binder = def;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see jaskell.runtime.types.JObject#eval()
+         */
+        public JObject eval() {
+            if (nargs < maxargs)
+                return this;
+            else {
+                for (int i = 0; i < maxargs; i++)
+                    if ((args[i] == zero) && binder.isStrict(i))
+                        return zero;
+                return one;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see jaskell.runtime.types.JFunction#init()
+         */
+        public JFunction init() {
+            return new StrictFunction(maxargs, binder);
+        }
+
+    }
+
+    /* standard function */
+    class Combinator extends Closure {
+
+        Abstraction abs;
+
+        StrictnessInterpreter interp;
+
+        /**
+         * @param n
+         */
+        public Combinator(int n, Abstraction abs, StrictnessInterpreter interp) {
+            super(n);
+            this.abs = abs;
+            this.interp = interp;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see jaskell.runtime.types.JObject#eval()
+         */
+        public JObject eval() {
+            if (nargs < maxargs)
+                return this;
+            else {
+                /* gives value to bindings */
+                int i = 0;
+                Map vars = new LinkedHashMap(abs.getBindings());
+                Iterator it = vars.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    entry.setValue(args[i++]);
+                }
+                interp.pushContext(vars);
+                /* instantiate abs body and call eval on it */
+                JObject val = (JObject) abs.getBody().visit(interp);
+                interp.popContext();
+                return val;
+            }
+
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see jaskell.runtime.types.JFunction#init()
+         */
+        public JFunction init() {
+            return new Combinator(maxargs, abs, interp);
+        }
+
+    }
 }
