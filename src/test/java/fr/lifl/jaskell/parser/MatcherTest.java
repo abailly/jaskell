@@ -148,14 +148,12 @@ public class MatcherTest extends TestCase {
 		
 	public void testHead() {
 		String text =
-			"{	head 0 y = [] ;" + " head n (x:xs) = x : (head (n-1) xs)}";
+			"module Main where {	head 0 y = [] ;" + " head n (x:xs) = x : (head (n-1) xs)}";
 		StringReader sr = new StringReader(text);
 		Yyparser p = new Yyparser();
 		p.parse(sr);
 		Module m = (Module) Module.getToplevels().get("Main");
 		System.err.println(m);
 	}
-	
-		
 		
 }

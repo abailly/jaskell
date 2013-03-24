@@ -1,28 +1,28 @@
 /**
  *  Copyright Murex S.A.S., 2003-2013. All Rights Reserved.
- * 
+ *
  *  This software program is proprietary and confidential to Murex S.A.S and its affiliates ("Murex") and, without limiting the generality of the foregoing reservation of rights, shall not be accessed, used, reproduced or distributed without the
  *  express prior written consent of Murex and subject to the applicable Murex licensing terms. Any modification or removal of this copyright notice is expressly prohibited.
  */
 package fr.lifl.jaskell.compiler.core;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 import fr.lifl.jaskell.compiler.JaskellVisitor;
 import fr.lifl.jaskell.compiler.types.Type;
 import fr.lifl.parsing.Namespace;
 import fr.lifl.parsing.SymbolException;
 
+import java.util.*;
+import java.util.logging.Logger;
+
 
 /**
  * this class holds all declarations from a module A Module is a namespace which can contains Jaskell-Core declarations
  * and other modules. There exists one default module named Main which is created whether or not a real module named
  * Main appears in the source code.
- *
+ * <p/>
  * <p>Modules are named hierarchically like Java packages with '.' as separator in identifiers.
  *
- * @author  bailly
+ * @author bailly
  * @version $Id: Module.java 1154 2005-11-24 21:43:37Z nono $
  */
 public class Module implements Expression, Namespace {
@@ -39,7 +39,9 @@ public class Module implements Expression, Namespace {
      */
     private static Map toplevels = new HashMap();
 
-    /** toplevel declaration for module Prelude */
+    /**
+     * toplevel declaration for module Prelude
+     */
     public static Module PRELUDE = new Module("Prelude", null);
 
     //~ ----------------------------------------------------------------------------------------------------------------
@@ -49,19 +51,29 @@ public class Module implements Expression, Namespace {
     /* map from type names to their definitions */
     private Map typeMap = new HashMap();
 
-    /** this map holds name to objects mapping in this module */
+    /**
+     * this map holds name to objects mapping in this module
+     */
     private Map symbols = new HashMap();
 
-    /** full name of this module */
+    /**
+     * full name of this module
+     */
     private String name;
 
-    /** A list of all modules with this module as parent */
+    /**
+     * A list of all modules with this module as parent
+     */
     private List modules = new ArrayList();
 
-    /** Reference to the parent module of this module */
+    /**
+     * Reference to the parent module of this module
+     */
     private Module parent;
 
-    /** list of type definitions */
+    /**
+     * list of type definitions
+     */
     private List typeDefinitions = new ArrayList();
 
     /* Map of imported modules and definitions */
@@ -105,7 +117,7 @@ public class Module implements Expression, Namespace {
 
     /**
      * Adds a new imported module to this module
-     *
+     * <p/>
      * <p>The imported namespace is used to resolved unqualified symbols if lookup in current module failed.
      *
      * @param imp a module
@@ -116,7 +128,7 @@ public class Module implements Expression, Namespace {
 
     /**
      * Adds a new imported module renamed with <code>name</code>
-     *
+     * <p/>
      * <p>Symbols prefixed with the given name will be resolved against this module.
      *
      * @param name
@@ -130,10 +142,9 @@ public class Module implements Expression, Namespace {
      * Adds a module named name to this module. If name already exists as an used identifier in this Module, throws an
      * IllegalArgumentException
      *
-     * @param     name   name of module to add
-     * @param     module Module object to add. May not be null
-     *
-     * @exception IllegalArgumentException if name is already used in this module
+     * @param name   name of module to add
+     * @param module Module object to add. May not be null
+     * @throws IllegalArgumentException if name is already used in this module
      */
     public void addModule(String name, Module module) {
         bind(name, module);
@@ -153,8 +164,7 @@ public class Module implements Expression, Namespace {
      * Lookup object in module by name This method retrieves an object stored in this module by its name. The name must
      * be an unqualified name and is looked for in this module
      *
-     * @param  name an unqualified name to look for
-     *
+     * @param name an unqualified name to look for
      * @return object referred by this name in this module or null if not found
      */
     public Object resolve(String name) {
@@ -184,8 +194,7 @@ public class Module implements Expression, Namespace {
      * Lookup object in module and parent module by name This method is like lookup(String) but delegates lookup to
      * parent module if name is not defined in current module
      *
-     * @param  name name of object to find
-     *
+     * @param name name of object to find
      * @return a Definition or null if name not defined in this or parents modules
      */
     public Object lookupDeep(String name) {
@@ -241,11 +250,11 @@ public class Module implements Expression, Namespace {
         if (name == null)
             throw new IllegalArgumentException("Cannot bind null name");
         if (symbols.get(name) != null) {
-            log.severe("Trying to bind duplicate symbol " + name + " in module " + this.name);
-        } else {
-            e.setParent(this);
-            symbols.put(name, e);
+            throw new IllegalArgumentException("Trying to bind duplicate symbol " + name + " in module " + this.name);
         }
+
+        e.setParent(this);
+        symbols.put(name, e);
     }
 
     /**
@@ -266,9 +275,8 @@ public class Module implements Expression, Namespace {
      * Binds value to name in this module. This method does not complains if name is already bound : it justs discards
      * the old definition
      *
-     * @param  name  name of symbol
-     * @param  value bound object
-     *
+     * @param name  name of symbol
+     * @param value bound object
      * @return old bound value or null
      */
     public Object rebind(String name, Object value) {
@@ -411,7 +419,7 @@ public class Module implements Expression, Namespace {
      */
     public Object unbind(String name) throws SymbolException {
         throw new SymbolException("Cannot unbind " + name +
-            " in Module environment");
+                " in Module environment");
     }
 
     /*
@@ -435,8 +443,7 @@ public class Module implements Expression, Namespace {
     /**
      * Method resolveImport. Resolve a name with respect to imported modules
      *
-     * @param  name
-     *
+     * @param name
      * @return Expression
      */
     private Expression resolveImport(String name) {
@@ -453,8 +460,7 @@ public class Module implements Expression, Namespace {
     /**
      * Method resolveTypeImport. Resolve a type name with respect to imported modules
      *
-     * @param  name
-     *
+     * @param name
      * @return Expression
      */
     private Definition resolveTypeImport(String name) {

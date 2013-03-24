@@ -33,9 +33,10 @@ import oqube.bytes.loading.ClassFileLoader;
  */
 public class CompilerTest extends TestCase {
 
-    //~ ----------------------------------------------------------------------------------------------------------------
-    //~ Constructors 
-    //~ ----------------------------------------------------------------------------------------------------------------
+    static {
+        BytecodeGenerator.setLoader(new ClassFileLoader(ClassLoader.getSystemClassLoader()));
+    }
+
 
     /**
      * Constructor for CompilerTest.
@@ -104,16 +105,16 @@ public class CompilerTest extends TestCase {
         m.visit(tc);
         m.visit(sal);
         m.visit(gen);
-        ClassFileLoader writer = new ClassFileLoader(BytecodeGenerator.getLoader());
+        ClassFileLoader writer = (ClassFileLoader) BytecodeGenerator.getLoader();
         BytecodeGenerator.cleanupClassFiles(writer);
-        Type2Class.cleanupClassFiles(writer);
         /* resolve Main class and call myMax */
-        Class cls = writer.loadClass("Main");
+        Class cls = writer.loadClass("Main$Module");
         assertNotNull(cls);
         Method met = cls.getMethod("fac", null);
         assertNotNull(met);
         Object obj = met.invoke(null, null);
-        met = obj.getClass().getMethod("eval", new Class[] { int.class, int.class });
+        Class<?> facClass = obj.getClass();
+        met = facClass.getMethod("eval", new Class[]{int.class, int.class});
         obj = met.invoke(obj, new Object[] { new Integer(4) });
         assertEquals(20, ((Integer) obj).intValue());
     }

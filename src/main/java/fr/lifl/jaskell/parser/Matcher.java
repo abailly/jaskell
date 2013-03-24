@@ -75,9 +75,7 @@ public class Matcher {
      * Method mixedRule.
      *
      * @param  vars
-     * @param  l
      * @param  def
-     * @param  sortedPats a List of List of PatternMatch
      *
      * @return Expression
      */
@@ -110,12 +108,9 @@ public class Matcher {
         /* construct case expression */
         Alternative alt = new Alternative();
         alt.setExpression(new Variable(subst.getName()));
-        alt.putTag(((PatternMatch) pats.get(0)).expr.getTag("source")); /*
-                                                                         * set
-                                                                         * source
-                                                                         * infor
-                                                                         */
+        PatternMatch patternMatch = (PatternMatch) pats.get(0);
         Iterator it = pats.iterator();
+        setSourceInfo(patternMatch.expr,alt);
         /* construct alternative elements */
         LinkedList lhm = new LinkedList();
         List ctorlist = new LinkedList(); /* list of patterns grouped by similarity */
@@ -142,7 +137,7 @@ public class Matcher {
                     /* duplicate variables list */
                     lastctor = new ConstructorPattern();
                     /* set source info */
-                    lastctor.putTag(cpat.getTag("source"));
+                    setSourceInfo(lastctor, cpat);
                     ctorlist.add(lastctor);
                     ((ConstructorPattern) lastctor).setConstructor(cpat.getConstructor());
                     Iterator itsubpat = cpat.getSubPatterns();
@@ -185,6 +180,13 @@ public class Matcher {
         return alt;
     }
 
+    private void setSourceInfo(Expression from, Expression to) {
+        Tag source = from.getTag("source");
+        if(source != null) {
+            to.putTag(source);
+        }
+    }
+
     /**
      * Method error.
      *
@@ -217,12 +219,18 @@ public class Matcher {
             /* substitue variables */
             HashMap hm = new HashMap();
             Variable v = new Variable(subst.getName());
-            v.putTag(pm.expr.getTag("source")); /* set source info */
+            setSourceInfo(pm, v);
             hm.put(var.getName(), v);
             Substitution s = new Substitution(hm);
             pm.expr = (Expression) pm.expr.visit(s);
         }
         return match(vars, pats, def);
+    }
+
+    private void setSourceInfo(PatternMatch pm, Variable v) {
+        Tag source = pm.expr.getTag("source");
+        if(source !=null) 
+        v.putTag(source); 
     }
 
     /**

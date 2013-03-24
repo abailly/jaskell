@@ -21,7 +21,6 @@ public class CodeGeneratorTest extends TestCase {
         BytecodeGenerator.setLoader(new ClassFileLoader(ClassLoader.getSystemClassLoader()));
     }
 
-
     public CodeGeneratorTest(String arg) {
         super(arg);
     }

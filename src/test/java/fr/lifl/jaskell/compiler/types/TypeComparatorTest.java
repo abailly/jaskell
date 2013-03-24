@@ -33,13 +33,6 @@ public class TypeComparatorTest extends TestCase {
 		super(arg0);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		Class.forName("jaskell.compiler.core.Primitives");
-	}
-
 	/*
 	 * test basic types
 	 */

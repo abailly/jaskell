@@ -24,8 +24,13 @@ public class LambdaLifterTest extends TestCase {
 		super(arg0);
 	}
 
-	public void testSimple() {
-		String text = "{f x = (\\ y -> x + y) 4 + 2}";
+    @Override
+    public void setUp() throws Exception {
+        Module.getToplevels().clear();
+    }
+
+    public void testSimple() {
+		String text = "module Main where {f x = (\\ y -> x + y) 4 + 2}";
 		StringReader sr = new StringReader(text);
 		Yyparser p = new Yyparser(false);
 		p.parse(sr);
@@ -39,7 +44,7 @@ public class LambdaLifterTest extends TestCase {
 	}
 	
 	public void testNested() {
-		String text = "{f x = (\\ y -> x + (\\ z -> y * x + z)) 4 + 2}";
+		String text = "module Main where {f x = (\\ y -> x + (\\ z -> y * x + z)) 4 + 2}";
 		StringReader sr = new StringReader(text);
 		Yyparser p = new Yyparser(false);
 		p.parse(sr);
@@ -54,9 +59,9 @@ public class LambdaLifterTest extends TestCase {
 	}
 		
 	public void testLet() {
-		String text = "{f x y = let a k = x + k in (a 1) * y}";
+		String text = "module Main where {f x y = let a k = x + k in (a 1) * y}";
 		StringReader sr = new StringReader(text);
-		Yyparser p = new Yyparser();
+		Yyparser p = new Yyparser(false);
 		p.parse(sr);
 		Module m = (Module) Module.getToplevels().get("Main");
 		System.out.println(m);
@@ -69,9 +74,9 @@ public class LambdaLifterTest extends TestCase {
 	}
 	
 	public void testRecursiveLet() {
-		String text = "{f x  = let { even 0 = true; even x = odd (x + -1); odd 0  =false; odd x = even (x + -1) } in odd x; main = f 10;}";
+		String text = "module Main where {f x  = let { even 0 = true; even x = odd (x + -1); odd 0  =false; odd x = even (x + -1) } in odd x; main = f 10}";
 		StringReader sr = new StringReader(text);
-		Yyparser p = new Yyparser();
+		Yyparser p = new Yyparser(false);
 		p.parse(sr);
 		Module m = (Module) Module.getToplevels().get("Main");
 		System.out.println(m);
@@ -82,6 +87,5 @@ public class LambdaLifterTest extends TestCase {
 		assertNotNull(m.lookup("lambda0"));	
 		System.out.println(m);
 	}
-		
 		
 }
