@@ -58,7 +58,7 @@ class AbsolutePrimitiveCode implements PrimitiveCode {
     //~ ----------------------------------------------------------------------------------------------------------------
 
     public Instruction emit(ClassFile cf) {
-        return (Instruction) inst.clone();
+        return (Instruction) inst.clone(cf);
     }
 }
 

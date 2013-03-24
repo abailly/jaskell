@@ -24,7 +24,7 @@ import fr.lifl.jaskell.runtime.types.*;
 public interface Primitives {
 
     //~ ----------------------------------------------------------------------------------------------------------------
-    //~ Static fields/initializers 
+    //~ Instance fields 
     //~ ----------------------------------------------------------------------------------------------------------------
 
     /** primitive types */
@@ -211,6 +211,8 @@ public interface Primitives {
     PrimitiveFunction NEG_INT = new PrimitiveFunction("negate", Module.PRELUDE, INT_INT, null);
 
     PrimitiveFunction PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, TypeFactory.makeApplication(TypeFactory.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
+
+    PrimitiveFunction PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, TypeFactory.makeApplication(TypeFactory.makeApplication(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
 
     /* primitive constructors */
     //    public static final PrimitiveData LIST_DATA =
