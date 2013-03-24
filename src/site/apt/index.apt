@@ -1,0 +1,18 @@
+ -----
+ Jaskell: Java compiler for Haskell language
+ ----- 
+ Arnaud Bailly
+ -----
+ 3 December 2005
+ -----
+ 
+Introduction 
+
+ <<Jaskell>> aims to be a  compiler for the
+ {{{http:://www.haskell.org} Haskell 98}} language, which is a
+ <<lazy>>, <<strongly typed>>, <<pure>> functional language. The
+ compiler generates
+ {{{http://java.sun.com/docs/books/vmspec/2nd-edition/html/Instructions.doc.html}
+ Java bytecode}} instructions and structure everything as Java classes which may be embedded
+ with standard Java language constructs.
+  

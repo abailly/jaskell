@@ -1,0 +1,306 @@
+  /************************************************************************
+ * HASKEL 98 Lexical Analyzer
+* Derived from :
+-- A Cactus representation of the Haskell grammar from the Haskell 98 report,
+-- starting with the Context-Free Syntax from appendix B.4, followed by
+-- rules from Lexical Syntax from appendix B.2.
+-- (Haskell layout rules are not represented.)
+* Author : Arnaud Bailly
+* Version : $Id: Yylex 1154 2005-11-24 21:43:37Z nono $^
+**************************************************************************/
+
+package fr.lifl.jaskell.parser;
+
+import fr.lifl.jaskell.compiler.core.*;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
+
+%%
+
+%line
+%char
+%integer
+%{
+  /* the parser object we use */
+  Yyparser parser; 
+
+  private int yycolumn;
+
+  /** error manager */
+  private Logger log = Logger.getLogger("fidl.parser.jaskell");
+
+  /* get line number */
+  public int getLine() {
+    return yyline;
+  }
+  
+ /* set start line number */
+  public void setLine(int sl) {
+	yyline = sl;
+  }
+
+  public int getColumn() {
+    return yycolumn;
+  }
+
+  public void setColumn(int col) {
+    yycolumn = col;
+    }
+    
+public void yyerror(String msg) {
+  StringBuffer err = new StringBuffer("jaskell- ");
+  err.append(makePosition().toString())
+    .append(" : ")
+    .append(msg);
+
+    log.severe(err.toString());
+}
+
+public Tag makePosition() {
+  return new FileAndLineTag(parser.getSourceFile(),yyline,yycolumn);
+}
+
+%}
+
+octal=[0-7]
+large=[A-Z]
+small=[a-z]
+digit=[0-9]
+hexit=({digit}|[a-fA-F])
+hexadecimal={hexit}+
+decimal={digit}+
+symbol=["!#$%&*+./<=>?@\\^|-"\"] 
+special=["(),;[]`{}"\"]  
+graphic=({small}|{large}|{symbol}|{digit}|{special}|":"|\"|"'") 
+idchar=({small}|{large}|{digit}|"'") 
+charesc=[abfnrtv\\\&\"\'] 
+ht=\x09 
+lf=\x0a 
+ff=\x0c 
+cr=\x0d 
+sp=" " 
+whitechar=[ \t\b\f] 
+line_terminator=({lf}|{cr}|{cr}{lf})  
+space={sp} 
+escape=\\({charesc}|{decimal}|o{octal}|x{hexadecimal}) 
+gap=\\{whitechar}+\\ 
+cid={large}{idchar}* 
+id={small}{idchar}* 
+qualifier={cid}"." 
+varsy={symbol}({symbol}|:)* 
+consy=:({symbol}|:)* 
+%%
+
+"module" {yycolumn = yychar; return Yyparser.MODULE;}
+"where" {yycolumn = yychar; return Yyparser.WHERE;}
+"type" {yycolumn = yychar;  return Yyparser.TYPE;}
+"data" {yycolumn = yychar;  return Yyparser.DATA;}
+"newtype" {yycolumn = yychar;  return Yyparser.NEWTYPE;}
+"class" {yycolumn = yychar;  return Yyparser.CLASS;}
+"instance" {yycolumn = yychar;  return Yyparser.INSTANCE;}
+"default" {yycolumn = yychar;  return Yyparser.DEFAULT;}
+"deriving" {yycolumn = yychar;  return Yyparser.DERIVING;}
+"as" {yycolumn = yychar;  return Yyparser.AS;}
+"import" {yycolumn = yychar;  return Yyparser.IMPORT;}
+"let" {yycolumn = yychar;  return Yyparser.LET;}
+"in" {yycolumn = yychar;  return Yyparser.IN;}
+"if" {yycolumn = yychar;  return Yyparser.IF;}
+"then" {yycolumn = yychar;  return Yyparser.THEN;}
+"else" {yycolumn = yychar;  return Yyparser.ELSE;} 
+"case" {yycolumn = yychar;  return Yyparser.CASE;}   
+"of" {yycolumn = yychar;  return Yyparser.OF;}
+"do" {yycolumn = yychar;  return Yyparser.DO;}
+"NATIVE" { yycolumn = yychar;  return Yyparser.NATIVE; }
+"{-#" {yycolumn = yychar;  return Yyparser.OPENPRAGMA;}
+"#-}" {yycolumn = yychar;  return Yyparser.CLOSEPRAGMA;}
+"{-" {yycolumn = yychar;  return Yyparser.OPENCOMMENT;}
+"-}" {yycolumn = yychar;  return Yyparser.CLOSECOMMENT;}
+"@" {yycolumn = yychar;  return Yyparser.AT;}
+"~" {yycolumn = yychar;  return Yyparser.IRREF;}
+"="  {yycolumn = yychar;  return Yyparser.EQ;}
+".." {yycolumn = yychar;  return Yyparser.ENUM;}
+"{" {yycolumn = yychar;  return Yyparser.L_BRACE;}
+"}" {yycolumn = yychar;  return Yyparser.R_BRACE;}
+"(" {yycolumn = yychar;  return Yyparser.L_PAREN;}
+")" {yycolumn = yychar;  return Yyparser.R_PAREN;}
+"[" {yycolumn = yychar;  return Yyparser.L_BRACKET;}
+"]" {yycolumn = yychar;  return Yyparser.R_BRACKET;}
+";" {yycolumn = yychar;  return Yyparser.SEMICOLON;}
+"," {yycolumn = yychar;  return Yyparser.COMMA;}
+":" {yycolumn = yychar;  return Yyparser.COLON;}
+"::" {yycolumn = yychar;  return Yyparser.DOUBLECOLON;}
+"=>" {yycolumn = yychar;  return Yyparser.CONTEXT_OP;}
+"->" {yycolumn = yychar;  return Yyparser.FUNOP;}
+"<-"     {yycolumn = yychar;  return Yyparser.QUALOP;}
+"!"      {yycolumn = yychar;  return Yyparser.STRICT;}
+"-"      {yycolumn = yychar;  return Yyparser.MINUS;}
+"|"      {yycolumn = yychar;  return Yyparser.BAR;}
+"infixl" {yycolumn = yychar;  return Yyparser.INFIXL;}
+"infixr" {yycolumn = yychar;  return Yyparser.INFIXR;}
+"infix" {yycolumn = yychar;  return Yyparser.INFIX;}
+\\ {yycolumn = yychar;  return Yyparser.LAMBDA;}
+"_" {yycolumn = yychar;  return Yyparser.WILDCARD;} 
+"`" {yycolumn = yychar;  return Yyparser.INFIXOP;}
+"<" {yycolumn = yychar; return Yyparser.L_ANGLE;}
+">" {yycolumn = yychar; return Yyparser.R_ANGLE;}
+"." {yycolumn = yychar; return Yyparser.POINT;}
+	
+"True" { 
+ parser.yylval= new BooleanLiteral(true);
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.BOOLEAN;
+}
+
+"False" {  
+  parser.yylval= new BooleanLiteral(false);
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.BOOLEAN;
+}
+
+--.*{line_terminator} { yycolumn = yychar;  return yylex(); /* single line comments */ }
+
+
+{qualifier}           { yycolumn = yychar;  return Yyparser.QUALIFIED; }
+
+{qualifier}?{cid}     { 
+  String txt = yytext();
+  int nidx = txt.lastIndexOf('.');
+  QualifiedConstructor qv =null;
+  if(nidx > -1) {
+    qv = new QualifiedConstructor(txt.substring(nidx+1));
+    StringTokenizer st = new StringTokenizer(txt.substring(nidx),".");
+    while(st.hasMoreTokens()) 
+      qv.addPathElement(st.nextToken());
+  } else { 
+    qv = new QualifiedConstructor(txt);
+  }
+  /* set yylval */
+  parser.yylval = qv;
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.QCONID;
+}
+
+
+{cid}                 {
+  Constructor qv = new Constructor(yytext());
+  parser.yylval = qv;
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.CONID;
+ }
+
+
+{qualifier}?{id}      { 
+  String txt = yytext();
+  int nidx = txt.lastIndexOf('.');
+  QualifiedVariable qv = null;
+  if(nidx > -1) {
+    qv = new QualifiedVariable(txt.substring(nidx+1));
+    StringTokenizer st = new StringTokenizer(txt.substring(nidx),".");
+    while(st.hasMoreTokens()) 
+      qv.addPathElement(st.nextToken());
+  } else { 
+    qv = new QualifiedVariable(txt);
+  }
+  parser.yylval = qv;
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.QVARID;
+}
+
+{id}                  {
+  Variable qv = new Variable(yytext());
+  parser.yylval = qv;
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.VARID;
+ }
+
+{qualifier}?{varsy}   { 
+  String txt = yytext();
+  int nidx = txt.lastIndexOf('.');
+  QualifiedVariable qv =null;
+  if(nidx > -1) {
+    qv = new QualifiedVariable("(" + txt.substring(nidx+1)+")");
+    StringTokenizer st = new StringTokenizer(txt.substring(nidx),"."); 
+    while(st.hasMoreTokens()) 
+      qv.addPathElement(st.nextToken());
+  } else { 
+    qv = new QualifiedVariable(txt);
+  }
+  parser.yylval = qv; 
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.QVARSYM;
+}
+
+{varsy}               {
+  Variable qv = new Variable("(" + yytext()+")");
+  parser.yylval = qv;
+  yycolumn = yychar;  return Yyparser.VARSYM;
+}
+
+{qualifier}?{consy}   { 
+  String txt = yytext();
+  int nidx = txt.lastIndexOf('.');
+  QualifiedConstructor qv =  null;
+  if(nidx > -1) {
+    qv = new QualifiedConstructor("(" + txt.substring(nidx+1)+")");
+    StringTokenizer st = new StringTokenizer(txt.substring(nidx),"."); 
+    while(st.hasMoreTokens()) 
+      qv.addPathElement(st.nextToken());
+  } else { 
+    qv = new QualifiedConstructor(txt);
+  }
+  parser.yylval = qv; 
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.QCONSYM;
+}
+
+{consy}               {
+  Constructor qv = new Constructor("(" + yytext()+")");
+  parser.yylval = qv;
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.CONSYM;
+ }
+
+0(o|O){octal}+       { 
+  parser.yylval= new IntegerLiteral(Integer.parseInt(yytext(),8));
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.INTEGER;
+}
+
+0(x|X){hexadecimal}   { 
+  parser.yylval= new IntegerLiteral(Integer.parseInt(yytext().substring(2),16));
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.INTEGER;
+}
+
+{decimal}           { 
+  parser.yylval= new IntegerLiteral(Integer.parseInt(yytext()));
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.INTEGER;
+}
+
+
+{decimal}\.{decimal}((e|E)(\+|\-)?{decimal})?  { 
+  parser.yylval= new FloatLiteral(Float.parseFloat(yytext()));
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.FLOAT;
+}
+
+\'([^\'\\]|{space}|{escape})\'                 { 
+  parser.yylval= new CharLiteral(yytext().charAt(1));
+  parser.yylval.putTag(makePosition());
+  yycolumn = yychar;  return Yyparser.CHAR;
+}
+
+\"([^\"\\]|{space}|{escape}|{gap})*\"          {
+parser.yylval = new StringLiteral(yytext().substring(1,yytext().length()-1));
+  parser.yylval.putTag(makePosition());
+yycolumn = yychar;  return Yyparser.STRING;
+}
+
+{whitechar}+                                   {yycolumn = yychar; return yylex();} 
+{line_terminator}+   {yychar = 0; return yylex(); }
+
+. {System.err.println("Illegal input to Yylex, exiting"); yy_error(0,true); }
+
+
+

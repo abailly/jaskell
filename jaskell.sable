@@ -1,0 +1,527 @@
+/************************************************************************
+ * HASKEL 98 Grammar for SableCC
+* Derived from :
+-- A Cactus representation of the Haskell grammar from the Haskell 98 report,
+-- starting with the Context-Free Syntax from appendix B.4, followed by
+-- rules from Lexical Syntax from appendix B.2.
+-- (Haskell layout rules are not represented.)
+* Author : Arnaud Bailly
+**************************************************************************/
+
+Package jaskell.parser;
+
+Helpers
+
+ascii_character     = [0..0xff];
+  ascii_small         = ['a'..'z'];
+  ascii_caps          = ['A'..'Z'];
+  unicode_character   = [0..0xffff];
+
+octal =['0'..'7']+;
+large = ['A'..'Z'];
+small = ['a'..'z'];
+digit = ['0'..'9'];
+hexit = digit | (['A'..'F'] + ['a'..'f']);
+hexadecimal = hexit+;
+decimal = digit+;
+symbol = '!' | '#' | '$' | '%' | '&' | '*' | '+' | '.' | '/' | '<' | '=' | '>' | '?' | '@' | '\' | '^' | '|' | '-' | '~' | '"' ;
+special = '(' | ')' | ',' | ';' | '[' | ']' | '`' | '{' | '}' | '"';
+graphic = small | large | symbol | digit | special | ':' | '"' | ''';
+
+char_character = [ascii_character - [''' + '\']] ;
+string_character = [ascii_character - ['"' + '\']];
+
+charesc = 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\' | '&' | '"' | '\' | ''';
+
+ht  = 0x09;
+lf  = 0x0a;
+ff  = 0x0c;
+cr  = 0x0d;
+sp  = ' ';
+whitechar = ht | lf | ff | cr | sp;
+  line_terminator     = lf | cr | cr lf; 
+
+space = sp;
+
+escape = '\' (charesc  | decimal | 'o' octal | 'x' hexadecimal);
+
+gap = '\' whitechar+ '\';
+cid = large (small|large|digit|''')*;
+id = small (small|large|digit|''')*;
+qualifier = cid '.';
+varsy = symbol (symbol | ':')*;
+consy = ':'  (symbol | ':')*;
+
+Tokens
+
+/* constructors */
+qualified = qualifier;
+
+qconid = qualifier? cid;
+conid = cid;
+
+/* variables */
+qvarid = (qualifier)? id;
+varid = id;
+
+
+qvarsym = (qualifier)? varsy;
+varsym = varsy;
+qconsym = (qualifier)? consy;
+consym = consy;
+integer = decimal | '0' ('o' |  'O') octal | '0' ('x' | 'X' ) hexadecimal;
+float = decimal '.' decimal ( ('e' | 'E') ('+' | '-')? decimal)?;
+
+
+char = '''( char_character | space | escape) ''';
+string = '"' ( string_character | space | escape | gap)* '"';
+
+comment        = '--' graphic* line_terminator;
+
+whitespace = whitechar+;
+
+/*******************************
+	Haskell keywords
+ *******************************/
+module = 'module';
+where = 'where';
+typet = 'type';
+data = 'data';
+newtype = 'newtype';
+klass = 'class';
+instance = 'instance';
+default = 'default';
+derivingt = 'deriving';
+as = 'as';
+importt = 'import';
+let = 'let';
+in = 'in';
+if = 'if';
+then = 'then';
+else = 'else';
+case = 'case';
+of ='of';
+do ='do';
+
+at = '@';
+irref = '~';
+eq = '=';
+enum = '..';
+l_brace = '{';
+r_brace = '}';
+  l_parenthese = '(';
+  r_parenthese = ')';
+  l_bracket = '[';
+  r_bracket = ']';
+  semicolon = ';';
+  comma = ',';
+  colon = ':';
+  doublecolon = '::';
+context_op = '=>';
+funop = '->';
+qualop = '<-';
+strict = '!';
+minus = '-';
+
+bar = '|';
+infixl = 'infixl';
+infixr = 'infixr';
+infix = 'infix';
+lambda = '\';
+wildcard = '_';
+infixop = '`';
+
+Ignored Tokens
+ 
+comment,whitespace;
+
+Productions
+
+modul = module modid exportspec? where body ;
+
+body = {full} l_brace impdecls semicolon topdecls r_brace |
+       {import} l_brace impdecls r_brace | 
+       {topdecl} l_brace topdecls r_brace;
+
+impdecls = impdecls_rest* impdecl;
+
+impdecls_rest = impdecl comma;
+
+exportspec = l_parenthese exports r_parenthese ; /* should allow a trailing comma!*/
+
+exports =  export export_rest* ;
+
+export_rest = comma export;
+
+export =  {var} qvar
+       |  {tycon} qtycon exportdetails?
+       |  {module} module modid
+       ;
+
+exportdetails = details ;
+
+details = {all} l_parenthese enum r_parenthese
+        | {list} l_parenthese qcname* r_parenthese
+        ;
+
+qcname = {var} qvar | {con} qcon ;
+
+impdecl =  importt modid imp_rename? impspec? ;
+imp_rename = as modid;
+
+impspec = l_parenthese imports? r_parenthese ; /* should allow a trailing comma!*/
+
+imports = import imports_rest*
+        ;
+imports_rest = comma import;
+
+import = {var} var
+       | {tycon} tycon importdetails? 
+       ;
+
+importdetails = details ; /* except that qualified names aren't allowed */
+
+/* cname = var | con ; */
+
+topdecls =  topdecl topdecls_rest* ;
+topdecls_rest = semicolon topdecl;
+
+topdecl = {type} typet simpletype eq type
+  | {data} data     optcontext? simpletype eq constrs deriving?
+  | {newtype} newtype  optcontext? simpletype eq newconstr deriving?
+  | {klass} klass    optscontext? tycls tyvar where_cdecls?
+  | {instance} instance optscontext? qconid inst where_idecls?
+  | {default} default l_parenthese defaults? r_parenthese
+  | {decl} decl
+  ;
+
+where_cdecls = where cdecls;
+
+where_idecls = where idecls;
+
+optcontext =  context context_op
+           ;
+
+optscontext =  scontext context_op
+            ;
+
+defaults =  type defaults_rest*
+         ;
+
+defaults_rest = comma type;
+
+
+decls =  {empty} l_brace r_brace
+      | {decls}  l_brace decl decls_rest* r_brace
+      ;
+
+decls_rest = semicolon decl;
+
+decl  = {general} gendecl
+      | {function}  funlhs rhs
+      | {pattern}  pat0n rhs
+      ;
+
+cdecls =  cdecl cdecls_rest*
+       ;
+
+cdecls_rest = semicolon cdecl;
+
+cdecl  = decl ; /* except that pat0n is restricted to var */
+
+idecls = {empty} l_brace r_brace
+      | {decls} l_brace idecl idecls_rest* r_brace
+      ;
+
+idecls_rest = semicolon idecl;
+
+idecl  = {function} funlhs rhs
+       | {qfunction} qfunlhs rhs
+       | {varpattern} pvar rhs
+       | {qvarpattern} pqvar rhs
+       ;
+
+pvar =  var ;
+pqvar = qvar ;
+
+gendecl = {type} vars doublecolon qualtype
+        | {fixity} fixity integer? ops
+        ;
+
+qualtype =  optcontext type ;
+
+ops =  op ops_rest* ;
+ops_rest = comma op;
+
+vars =  var vars_rest* ;
+vars_rest = comma var;
+
+fixity =  {left} infixl
+       |  {right} infixr
+       | {nonassoc} infix
+       ;
+
+type   =  {function} type funop btype
+      |  {base} btype
+      ;
+
+btype = {app} btype atype
+      | {atomic} atype
+      ;
+
+atype = {tycon}  gtycon
+      | {variable} tyvar
+      | {tuple} l_parenthese [fst]:type comma [snd]:type [rest]:comma_type* r_parenthese
+      | {list} l_bracket type r_bracket
+      | {nested} l_parenthese type r_parenthese
+      ;
+
+comma_type = comma type;
+
+gtycon = {qualified} qtycon
+       | {unit} l_parenthese r_parenthese
+       | {list}  l_bracket r_bracket
+       | {function} l_parenthese funop r_parenthese
+//     | {tuple} l_parenthese comma+ r_parenthese
+       ;
+
+// %type Context = [Class]
+
+context = type ; 
+//context :: Context
+//        = [$1]  = class
+//        | []    = l_parenthese r_parenthese
+//        | $2:$3 = l_parenthese class (comma class)* r_parenthese
+//        ;
+
+//class   :: Class
+//        = ConClass.. = qtycls tyvar
+//        | VarClass.. = qtycls l_parenthese tyvar atype+ r_parenthese
+//       ;
+
+scontext =  type ;
+//scontext = [$1]  = simpleclass
+//         | []    = l_parenthese r_parenthese
+//         | $2:$3 = l_parenthese simpleclass (comma simpleclass)* r_parenthese
+//         ;
+
+//simpleclass = ConClass.. = qtycls tyvar ;
+
+simpletype =  tycon tyvar* ;
+
+constrs =  constr constrs_rest* ;
+constrs_rest = bar constr;
+
+constr =  {con} con con_param*
+       |  {conop} [left]:conoptype conop [right]:conoptype
+       |  {record} con l_brace fielddecls r_brace
+       ;
+
+con_param = strictness? atype;
+
+strictness =  strict
+           ;
+
+conoptype =  {lazy} btype
+          |  {strict} strict atype
+          ;
+
+fielddecls =  fielddecl [fields]:fielddecls_rest*
+           ;
+fielddecls_rest = comma fielddecl;
+
+newconstr =  {con} con atype
+          |  {record} con l_brace var doublecolon type r_brace
+          ;
+
+fielddecl = vars doublecolon fieldtype ;
+
+fieldtype = {lazy} type
+          | {strict} strict atype
+          ;
+
+deriving = derivingt dclasses ;
+
+dclasses = {class} dclass
+         | {unit} l_parenthese r_parenthese
+         | {tuple} l_parenthese dclass dclasses_rest* r_parenthese
+         ;
+
+dclasses_rest = comma dclass;
+
+dclass = qtycls ;
+
+inst =  /*{tycon} gtycon
+     | */
+{con} l_parenthese gtycon tyvar* r_parenthese
+     | {tuple}  l_parenthese tyvar comma_tyvar [vars]:comma_tyvar* r_parenthese
+     | {list} l_bracket tyvar r_bracket
+     | {function} l_parenthese [left]:tyvar funop [right]:tyvar r_parenthese
+     ;
+
+comma_tyvar  = comma tyvar;
+
+funlhs = {function} var apat+
+       | {operator} [left]:pat0n varop [right]:pat0n
+//     | {nest} l_parenthese funlhs r_parenthese apat+
+       ;
+
+qfunlhs = {function} qvar apat+
+        | {operator} [left]:pat0n qvarop [right]:pat0n
+//      | {nest} l_parenthese qfunlhs r_parenthese apat+
+        ;
+
+rhs = {simple} eq exp wheredecls?
+    | {guarded} gdrhs wheredecls?
+    ;
+
+wheredecls =  where decls
+           ;
+
+gdrhs = gdexp+ ;
+gdexp = gd eq exp;
+
+gd = bar exp0n ;
+
+exp  = {typed} exp0n doublecolon qualtype
+    |  {untyped} exp0n
+    ;
+
+//%left.6 = '-'
+//%left.1 = doublecolon
+//%left.0 = 'in', 'else', funop
+
+exp0n =  {infixop} [left]:exp0n qop [right]:exp0n           // %prec '-'
+      |  {minux} minus exp0n
+      |  {base} exp10n
+      ;
+
+exp10n = {abstraction} lambda pat+ funop exp
+       | {let} let decls in exp
+       | {conditional} if [cond]:exp then [iftrue]:exp else [iffalse]:exp
+       | {alternative} case exp of l_brace alts r_brace
+       | {loop} do l_brace stmts r_brace
+       | {expression}  fexp
+       ;
+
+fexp  =  {application} fexp aexp
+      |  {atomic} aexp
+      ;
+
+aexp  = {variable} qvar
+      | {con}  gcon
+      | {literal} literal
+      | {nested} l_parenthese exp r_parenthese
+      | {tuple} l_parenthese exp exprs+ r_parenthese
+      | {list} l_bracket exp exprs* r_bracket
+      | {sequence} l_bracket [start]:exp [incr]:exprs? enum [end]:exp? r_bracket
+      | {lsection} l_parenthese exp0n qop r_parenthese
+      | {rsection} l_parenthese qop exp0n r_parenthese
+      | {record} aexp l_brace fbinds r_brace
+      ;
+
+exprs = comma exp;
+
+qual  = {generator} [left]:exp qualop [right]:exp
+//   = GenQual.. = pat qualop exp -- wanted...
+     | {decl} let decls
+     | {guard} exp
+     ;
+
+alts =  alt alts_rest*
+     ;
+
+alts_rest =semicolon alt;
+
+alt  = {simple} pat funop exp wheredecls
+     | {quarded} pat gdpats wheredecls
+//   | Empty   =
+     ;
+
+gdpats = gdpat+ ;
+gdpat = gd funop exp;
+
+stmts = stmt* exp semicolon? ;
+
+stmt = qual semicolon ;
+
+fbinds = fbind fbinds_rest*
+       ;
+fbinds_rest  = comma fbind;
+
+fbind = qvar eq exp ;
+
+pat = pat0n ;
+    // n+k
+
+pat0n =  {conop} [left]:pat0n qconop [right]:pat0n // %prec -
+     | {neg} minus pat0n
+     | {base} pat10n
+     ;
+
+pat10n = {atomic}  apat
+      | {con} gcon apat+
+      ;
+
+apat = {variable} var
+     | {aspattern} var at apat
+     | conpat
+     | {literal} literal
+     | {wildcard} wildcard
+     | {nested} l_parenthese pat r_parenthese
+     | {tuple} l_parenthese pat comma_pat [patterns]:comma_pat* r_parenthese
+     | {list} l_bracket pat [patterns]:comma_pat* r_bracket
+     | {irrefutable} irref apat
+     ;
+conpat = {unit} l_parenthese r_parenthese 
+     | {empty} l_bracket r_bracket
+//   | {tuple} l_parenthese comma+ r_parenthese
+//     | {con} qcon recordcon?
+     ;
+
+recordcon = l_brace fpats r_brace;
+
+comma_pat = comma pat;
+
+fpats = fpat comma_fpat*
+      ;
+
+comma_fpat = comma fpat;
+
+fpat = qvar eq pat ;
+
+gcon = {unit} l_parenthese r_parenthese
+     | {empty} l_bracket r_bracket
+//   | {tuple} l_parenthese comma+ r_parenthese
+     | {con} qcon
+     ;
+
+var    = {named} varid 
+       | {operator} l_parenthese varsym r_parenthese ;
+qvar   = {named} qvarid
+       | {operator} l_parenthese qvarsym r_parenthese ;
+con    = {named} conid
+       | {operator}  l_parenthese consym r_parenthese ;
+qcon   = {named} qconid
+       | {operator} l_parenthese gconsym r_parenthese ;
+varop  = {operator} varsym
+       | {infixid} [left]:infixop varid [right]:infixop ;
+qvarop = {operator} qvarsym
+       | {infixid} [left]:infixop qvarid [right]:infixop ;
+conop  = {operator} consym
+       | {infixid} [left]:infixop conid [right]:infixop ;
+qconop = {operator} gconsym
+       | {infixid} [left]:infixop qconid [right]:infixop ;
+op     = {var} varop | {con} conop ;
+qop  = {qvar} qvarop | {qcon} qconop ;
+gconsym = {cons} colon | {conop} qconsym ;
+
+modid    = qualified? conid ;
+qtycon  = qconid ;
+tycon    = conid ;
+tyvar    = varid ;
+tycls    = conid ;
+qtycls  = qconid ;
+
+literal = {int} integer | {float} float | {char} char | {string} string;
+
