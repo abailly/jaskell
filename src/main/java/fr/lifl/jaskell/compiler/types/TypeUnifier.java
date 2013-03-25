@@ -50,9 +50,6 @@ public class TypeUnifier implements TypeVisitor {
 		return result;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeVariable)
-	 */
 	public Object visit(TypeVariable t) {
 		/* try to find type variable in map */
 		Type m = (Type) map.get(t);
@@ -91,9 +88,6 @@ public class TypeUnifier implements TypeVisitor {
 		}
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(PrimitiveType)
-	 */
 	public Object visit(PrimitiveType primitiveType) {
 		if (to instanceof PrimitiveType && primitiveType.equals(to))
 			return primitiveType;
@@ -106,9 +100,6 @@ public class TypeUnifier implements TypeVisitor {
 
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeApplication)
-	 */
 	public Object visit(TypeApplication typeApplication) {
 		if (to instanceof TypeApplication) {
 			TypeApplication ta = (TypeApplication) to;
@@ -127,9 +118,6 @@ public class TypeUnifier implements TypeVisitor {
 		}
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeConstructor)
-	 */
 	public Object visit(TypeConstructor typeConstructor) {
 		if (to instanceof TypeConstructor && typeConstructor.equals(to))
 			return typeConstructor;
@@ -140,5 +128,10 @@ public class TypeUnifier implements TypeVisitor {
 				"Cannot unify " + to + " with " + typeConstructor);
 		}
 	}
+
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return constrainedType;
+    }
 
 }

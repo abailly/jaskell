@@ -13,21 +13,10 @@ public class TypeSubstitution implements TypeVisitor {
 
 	private boolean incontext = false;
 
-	/**
-	 * Constructor for TypeSubstitution.
-	 * This constructs builds a default - empty - Type substitution
-	 * 
-	 */
 	public TypeSubstitution() {
 		this.map = new HashMap();
 	}
 
-	/**
-	 * Constructor for TypeSubstitution.
-	 * This constructs builds a Type Substitution backed by given
-	 * Map
-	 * 
-	 */
 	public TypeSubstitution(Map map) {
 		this.map = map;
 	}
@@ -46,9 +35,6 @@ public class TypeSubstitution implements TypeVisitor {
 		return ret;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeVariable)
-	 */
 	public Object visit(TypeVariable t) {
 		Type m = (Type) map.get(t);
 		if (m != null) {
@@ -57,16 +43,10 @@ public class TypeSubstitution implements TypeVisitor {
 		return t;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(PrimitiveType)
-	 */
 	public Object visit(PrimitiveType primitiveType) {
 		return primitiveType;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeApplication)
-	 */
 	public Object visit(TypeApplication typeApplication) {
 		Type t = TypeFactory.makeApplication(
 			(Type) typeApplication.getDomain().visit(this),
@@ -74,12 +54,14 @@ public class TypeSubstitution implements TypeVisitor {
 		return t;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeConstructor)
-	 */
 	public Object visit(TypeConstructor typeConstructor) {
 		return typeConstructor;
 	}
+
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return constrainedType;
+    }
 
 
 }

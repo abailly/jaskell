@@ -22,12 +22,6 @@ public class ConstantPropagatorTest extends TestCase {
 	}
 
 	public void testSimpleConstant() {
-		try {
-			Class.forName("jaskell.compiler.core.Primitives");
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		// build expression
 		Application a = new Application();
 		a.addArgument(new IntegerLiteral(1));

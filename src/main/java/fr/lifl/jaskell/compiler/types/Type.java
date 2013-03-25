@@ -6,9 +6,6 @@ import java.util.Map;
 
 class DefaultTypeApplicationFormat implements TypeApplicationFormat {
 
-	/**
-	 * @see jaskell.compiler.types.TypeApplicationFormat#formatApply(Type, Type)
-	 */
 	public String formatApply(Type dom, Type range) {
 		return dom + " " + range;
 	}
@@ -59,7 +56,7 @@ public abstract class Type {
 	 * @param v a TypeVisitor implementation
 	 * @return a visitor dependant object
 	 */
-	public abstract Object visit(TypeVisitor v);
+	public abstract <T> T visit(TypeVisitor<T> v);
 
 	/**
 	 * Method contains.
@@ -99,10 +96,7 @@ public abstract class Type {
 	 * @see java.lang.Object#toString()
 	 */
 	public String makeString() {
-		StringBuffer sb = new StringBuffer("");
-		/* call formatter for this type */
-		sb.append(toString());
-		return sb.toString();
+        return toString();
 	}
 
 	/**
@@ -158,7 +152,7 @@ public abstract class Type {
 
 	/**
 	 * Retrieve the TypeComparator associated with given type. 
-	 * The given type must be a TypeConstructor or a TypeApplication ferom
+	 * The given type must be a TypeConstructor or a TypeApplication from
 	 * which a TypeConstructor is extracted.
 	 * 
 	 * @param type a TypeConstructor or TypeApplication

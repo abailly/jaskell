@@ -469,6 +469,11 @@ public class Type2Class extends BytecodeGenerator implements TypeVisitor {
         }
     }
 
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return null;
+    }
+
     public Object visit(ConstructorDefinition cdef) {
         /* name of definition */
         String dname = BytecodeGenerator.encodeName2Java(cdef.getName());

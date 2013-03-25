@@ -1,53 +1,59 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
- <modelVersion>4.0.0</modelVersion>
- <groupId>foldlabs.jaskell</groupId>
- <artifactId>jaskell</artifactId>
- <packaging>jar</packaging>
- <version>1.0-SNAPSHOT</version>
- <name>Jaskell Language library</name>
- <url>http://github.com/abailly/jaskell/</url>
- <description>
-  Jaskell is a subset of Haskell implemented in Java. This library provide a full bytecode compiler for this language.
- </description>
- 
- <inceptionYear>2003</inceptionYear>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>foldlabs.jaskell</groupId>
+  <artifactId>jaskell</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Jaskell Language library</name>
+  <url>http://github.com/abailly/jaskell/</url>
+  <description>
+    Jaskell is a subset of Haskell implemented in Java. This library provide a full bytecode compiler for this language.
+  </description>
 
- <developers>
- 
-  <developer>
-   <name>Arnaud Bailly </name>
-   <id>bailly</id>
-   <email>bailly AT lifl POINT fr</email>
-    <organization> LIFL/Norsys</organization>
-    <roles>
-     <role>Developper</role>
-    </roles>
-  </developer>
- </developers>
+  <inceptionYear>2003</inceptionYear>
 
- <dependencies>
+  <developers>
 
-  <dependency>
-   <groupId>junit</groupId>
-   <artifactId>junit</artifactId>
-   <version>4.10</version>
-   <scope>test</scope>
-  </dependency>
+    <developer>
+      <name>Arnaud Bailly</name>
+      <id>bailly</id>
+      <email>bailly AT lifl POINT fr</email>
+      <organization>LIFL/Norsys</organization>
+      <roles>
+        <role>Developper</role>
+      </roles>
+    </developer>
+  </developers>
 
-  <dependency>
-   <groupId>fr.lifl</groupId>
-   <artifactId>parsing</artifactId>
-   <version>1.4-SNAPSHOT</version>
-  </dependency>
+  <dependencies>
 
-  <dependency>
-    <groupId>oqube.patchwork</groupId>
-    <artifactId>patchwork-bytes</artifactId>
-    <version>4-SNAPSHOT</version>
-  </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
 
- </dependencies>
- 
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.lifl</groupId>
+      <artifactId>parsing</artifactId>
+      <version>1.4-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>oqube.patchwork</groupId>
+      <artifactId>patchwork-bytes</artifactId>
+      <version>4-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
 </project>

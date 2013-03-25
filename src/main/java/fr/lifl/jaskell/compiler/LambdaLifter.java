@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import fr.lifl.jaskell.compiler.core.*;
+import fr.lifl.parsing.Namespace;
 import fr.lifl.parsing.SymbolException;
 
 
@@ -41,7 +42,7 @@ public class LambdaLifter extends JaskellVisitorAdapter {
     //~ ----------------------------------------------------------------------------------------------------------------
 
     /* the namespace where lifted abstractions should be bound */
-    private fr.lifl.parsing.Namespace ns;
+    private Namespace ns;
 
     /* counter for generated lambdas */
     private int counter = 0;
@@ -62,7 +63,7 @@ public class LambdaLifter extends JaskellVisitorAdapter {
         super();
     }
 
-    public LambdaLifter(fr.lifl.parsing.Namespace ns) {
+    public LambdaLifter(Namespace ns) {
         this.ns = ns;
     }
 
@@ -204,7 +205,7 @@ public class LambdaLifter extends JaskellVisitorAdapter {
      *
      * @see jaskell.compiler.JaskellVisitor#visit(jaskell.compiler.core.Module)
      */
-    public Object visit(fr.lifl.parsing.Namespace a) {
+    public Object visit(Namespace a) {
         /* set current namespace */
         ns = a;
         /*

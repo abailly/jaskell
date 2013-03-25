@@ -27,10 +27,7 @@ public class TypeVariable extends Type {
 		this.name = name;
 	}
 
-	/**
-	 * @see jaskell.compiler.core.Type#visit(TypeVisitor)
-	 */
-	public Object visit(TypeVisitor v) {
+	public <T> T visit(TypeVisitor<T> v) {
 		return v.visit(this);
 	}
 
@@ -49,16 +46,10 @@ public class TypeVariable extends Type {
 		return name;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.Type#contains(TypeVariable)
-	 */
 	public boolean contains(TypeVariable variableType) {
 		return this.equals(variableType);
 	}
 
-	/**
-	 * @see jaskell.compiler.types.Type#getKind()
-	 */
 	public Kind getKind() {
 		return kind;
 	}

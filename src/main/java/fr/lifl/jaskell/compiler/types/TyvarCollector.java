@@ -1,5 +1,5 @@
 /*
- * Created on 13 févr. 2004
+ * Created on 13 fï¿½vr. 2004
  * 
  * $Log: TyvarCollector.java,v $
  * Revision 1.1  2004/02/13 16:53:40  nono
@@ -54,5 +54,10 @@ public class TyvarCollector implements TypeVisitor {
 	public Object visit(TypeConstructor typeConstructor) {
 		return new HashSet();
 	}
+
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return new HashSet();
+    }
 
 }

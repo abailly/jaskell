@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A visitor implementation for instantiating type variables occurence
+ * A visitor implementation for instantiating type variables occurrence
  * into a type.
  * 
- * This class works by replacing every occurence of a variable into a given type
- * by a fresh variable or the content of a map. The constraints occuring into the type definition are 
+ * This class works by replacing every occurrence of a variable into a given type
+ * by a fresh variable or the content of a map. The constraints occurring into the type definition are 
  * also substituted and checked.
  * 
  * @author bailly
@@ -30,16 +30,10 @@ public class TypeInstantiator implements TypeVisitor {
 		this.base = type;
 	}
 
-	/**
-	 * @see jaskell.compiler.TypeVisitor#visit(PrimitiveType)
-	 */
 	public Object visit(PrimitiveType primitiveType) {
 		return primitiveType;
 	}
 
-	/**
-	 * @see jaskell.compiler.TypeVisitor#visit(TypeVariable)
-	 */
 	public Object visit(TypeVariable t) {
 		Type tv = (Type) map.get(t);
 		if (tv == null) {
@@ -89,9 +83,6 @@ public class TypeInstantiator implements TypeVisitor {
 		this.base = base;
 	}
 
-	/**
-	 * @see jaskell.compiler.TypeVisitor#visit(TypeApplication)
-	 */
 	public Object visit(TypeApplication typeApplication) {
 		Type ta = TypeFactory.makeApplication(
 			(Type) typeApplication.getDomain().visit(this),
@@ -99,14 +90,16 @@ public class TypeInstantiator implements TypeVisitor {
 		return ta;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.TypeVisitor#visit(TypeConstructor)
-	 */
 	public Object visit(TypeConstructor typeConstructor) {
 		return typeConstructor;
 	}
 
-	/**
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return constrainedType;
+    }
+
+    /**
 	 * Sets the map.
 	 * @param map The map to set
 	 */

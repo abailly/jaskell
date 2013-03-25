@@ -68,4 +68,9 @@ public class Type2String implements TypeVisitor {
         return "L" + BytecodeGenerator.encodeName2Java(typeConstructor.getName()) + ";";
     }
 
+    @Override
+    public Object visit(ConstrainedType constrainedType) {
+        return "Ljaskell/runtime/types/JObject;";
+    }
+
 }

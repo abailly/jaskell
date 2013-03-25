@@ -1,5 +1,5 @@
 /*
- * Created on 11 févr. 2004
+ * Created on 11 fï¿½vr. 2004
  * 
  * $Log: ExpressionTypeContext.java,v $
  * Revision 1.3  2004/02/19 14:55:01  nono
@@ -52,7 +52,7 @@ public class ExpressionTypeContext implements TypeContext {
 			mod = (Module) par;
 		if (t instanceof TypeApplication)
 			return mod.resolveType(
-				((TypeConstructor) ((TypeApplication) t).getConstructor())
+				((TypeConstructor) t.getConstructor())
 					.getName());
 		else if (t instanceof TypeConstructor)
 			return mod.resolveType(((TypeConstructor) t).getName());

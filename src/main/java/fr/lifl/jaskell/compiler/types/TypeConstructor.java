@@ -37,16 +37,10 @@ public class TypeConstructor extends Type {
 		this.kind = kind;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.Type#contains(TypeVariable)
-	*/
 	public boolean contains(TypeVariable variableType) {
 		return false;
 	}
 
-	/**
-	 * @see jaskell.compiler.types.Type#getKind()
-	 */
 	public Kind getKind() {
 		return kind;
 	}
@@ -77,10 +71,7 @@ public class TypeConstructor extends Type {
 		return at.name.equals(name);
 	}
 
-	/**
-	 * @see jaskell.compiler.types.Type#visit(TypeVisitor)
-	 */
-	public Object visit(TypeVisitor v) {
+	public <T> T visit(TypeVisitor<T> v) {
 		return v.visit(this);
 	}
 

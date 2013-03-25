@@ -34,32 +34,14 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
     //~ Constructors 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Constructor for PrimitiveType.
-     *
-     * @param name
-     * @param type
-     */
     public PrimitiveType(String name, Class clas) {
         this(name, clas, SimpleKind.K, null, null);
     }
 
-    /**
-     * Constructor for PrimitiveType.
-     *
-     * @param name
-     * @param type
-     */
     public PrimitiveType(String name, Class clas, Kind kind) {
         this(name, clas, kind, null, null);
     }
 
-    /**
-     * Constructor for PrimitiveType.
-     *
-     * @param name
-     * @param type
-     */
     public PrimitiveType(String name, Class clas, Kind kind, TypeApplicationFormat format, TypeComparator compar) {
         super(name, kind);
         this.javaClass = clas;
@@ -120,7 +102,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
      * A method to create simply function types This factory method is used to create function types from an domain and
      * range types
      *
-     * @param dom   the domain of function
+     * @param domain   the domain of function
      * @param range the range of function
      */
     public static Type makeFunction(Type domain, Type range) {
@@ -185,10 +167,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
         return TypeFactory.makeApplication(LIST, el);
     }
 
-    /**
-     * @see jaskell.compiler.core.Type#visit(TypeVisitor)
-     */
-    public Object visit(TypeVisitor v) {
+    public <T> T visit(TypeVisitor<T> v) {
         return v.visit(this);
     }
 
