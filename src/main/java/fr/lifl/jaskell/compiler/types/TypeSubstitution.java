@@ -1,5 +1,8 @@
 package fr.lifl.jaskell.compiler.types;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,59 +10,55 @@ import java.util.Map;
  * @author bailly
  * @version $Id: TypeSubstitution.java 1153 2005-11-24 20:47:55Z nono $
  */
-public class TypeSubstitution implements TypeVisitor {
+public class TypeSubstitution implements TypeVisitor<Type> {
 
-	private Map map;
+    private final Map<TypeVariable, Type> map;
 
-	private boolean incontext = false;
+    public TypeSubstitution() {
+        this.map = Maps.newHashMap();
+    }
 
-	public TypeSubstitution() {
-		this.map = new HashMap();
-	}
+    public TypeSubstitution(Map<TypeVariable,Type> map) {
+        this.map = ImmutableMap.copyOf(map);
+    }
 
-	public TypeSubstitution(Map map) {
-		this.map = map;
-	}
+    /**
+     * Applies m as a substitution for type variables
+     * occuring in t
+     *
+     * @param t the Type to substitute
+     * @return a new Type whose all occurences of mapping in m
+     *         have been replaced
+     */
+    public Type substitute(Type t) {
+        Type ret = t.visit(this);
+        return ret;
+    }
 
-	/**
-	 * Applies m as a substitution for type variables
-	 * occuring in t
-	 * 
-	 * @param t the Type to substitute
-	 * @param map the map to apply
-	 * @return a new Type whose all occurences of mapping in m 
-	 * have been replaced
-	 */
-	public Type substitute(Type t) {
-		Type ret = (Type) t.visit(this);
-		return ret;
-	}
+    public Type visit(TypeVariable t) {
+        Type m = map.get(t);
+        if (m != null) {
+            return m.visit(this);
+        }
+        return t;
+    }
 
-	public Object visit(TypeVariable t) {
-		Type m = (Type) map.get(t);
-		if (m != null) {
-			return m.visit(this);
-		}
-		return t;
-	}
+    public Type visit(PrimitiveType primitiveType) {
+        return primitiveType;
+    }
 
-	public Object visit(PrimitiveType primitiveType) {
-		return primitiveType;
-	}
+    public Type visit(TypeApplication typeApplication) {
+        return TypeFactory.makeApplication(
+                typeApplication.getDomain().visit(this),
+                typeApplication.getRange().visit(this));
+    }
 
-	public Object visit(TypeApplication typeApplication) {
-		Type t = TypeFactory.makeApplication(
-			(Type) typeApplication.getDomain().visit(this),
-			(Type) typeApplication.getRange().visit(this));
-		return t;
-	}
-
-	public Object visit(TypeConstructor typeConstructor) {
-		return typeConstructor;
-	}
+    public Type visit(TypeConstructor typeConstructor) {
+        return typeConstructor;
+    }
 
     @Override
-    public Object visit(ConstrainedType constrainedType) {
+    public Type visit(ConstrainedType constrainedType) {
         return constrainedType;
     }
 
