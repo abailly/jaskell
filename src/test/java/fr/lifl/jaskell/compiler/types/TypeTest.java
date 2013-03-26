@@ -6,19 +6,16 @@
  */
 package fr.lifl.jaskell.compiler.types;
 
+import fr.lifl.jaskell.compiler.core.Definition;
+import fr.lifl.jaskell.compiler.core.Primitives;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.lifl.jaskell.compiler.core.Definition;
-import fr.lifl.jaskell.compiler.core.Primitives;
-
-import junit.framework.TestCase;
-
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import org.junit.Ignore;
-import org.junit.Test;
 
 
 /**
@@ -43,11 +40,15 @@ public class TypeTest {
                 }
             }, new CovariantComparator());
 
-    public static final PrimitiveType FUNCTION = new PrimitiveType("(->)", fr.lifl.jaskell.runtime.types.Closure.class, new FunctionKind(SimpleKind.K, FunctionKind.K_K), new TypeApplicationFormat() {
+    public static final PrimitiveType FUNCTION = new PrimitiveType(
+            "(->)"
+            , fr.lifl.jaskell.runtime.types.Closure.class
+            , new FunctionKind(SimpleKind.K, FunctionKind.K_K), new TypeApplicationFormat() {
                 public String formatApply(Type d, Type r) {
                     return r + " ->";
                 }
-            }, new FunctionComparator());
+            }
+            , new FunctionComparator());
 
     public static final PrimitiveType INT = new PrimitiveType("Int", int.class);
 
@@ -172,7 +173,7 @@ public class TypeTest {
         Type t2 = PrimitiveType.makeFunction(INT, INT);
         t2.setContext(tctx);
         try {
-            Type t3 = new TypeUnifier().unify(t1, t2, m);
+            new TypeUnifier().unify(t1, t2, m);
             fail();
         } catch (TypeError te) {
         }

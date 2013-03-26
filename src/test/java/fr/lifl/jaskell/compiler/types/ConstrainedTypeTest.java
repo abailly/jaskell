@@ -1,32 +1,62 @@
 package fr.lifl.jaskell.compiler.types;
 
-import static fr.lifl.jaskell.compiler.types.TypeTest.FUNCTION;
-
-import static fr.lifl.jaskell.compiler.types.Types.apply;
-import static fr.lifl.jaskell.compiler.types.Types.var;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import org.fest.assertions.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static fr.lifl.jaskell.compiler.types.TypeTest.FUNCTION;
+import static fr.lifl.jaskell.compiler.types.Types.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * TODO handle constraints identification
+ * TODO handle superclass/subclass constraint widening
+ * TODO handle constraints unification on variables
+ * TODO handle constraints removal with instance
+ * TODO multivariate typeclasses constraints
+ * TODO type identification constraints (eg. a ~ b)
+ */
 public class ConstrainedTypeTest {
+
+    private static Type eqA = constraint(var("a"), typeClass("Eq", var("a")));
+    private static Type eqB = constraint(var("b"), typeClass("Eq", var("b")));
+    private static Type eqC = constraint(var("c"), typeClass("Eq", var("c")));
 
     @Test
     public void typeClassConstraintIsPropagatedWhenApplyingType() {
-        TypeVariable v = var("a");
-        ConstrainedType constrainedType = new ConstrainedType(v,
-                new TypeClassConstraint(new TypeClass("Eq"),v));
+        Type functionWithConstrainedDomain = apply(apply(FUNCTION,
+                eqA),
+                var("b"));
 
-        Type v2 = var("b");
-        Type t1 = apply(apply(FUNCTION, constrainedType), v2);
+        Type functionWithConstrainedRange = apply(apply(FUNCTION,
+                var("b")),
+                eqA);
 
-        Type constrainedFunctionType = new ConstrainedType(apply(apply(FUNCTION, v), v2),
-                new TypeClassConstraint(new TypeClass("Eq"),v));
+        Type constrainedFunctionType = constraint(
+                apply(apply(FUNCTION, var("a")), var("b")), typeClass("Eq", var("a"))
+        );
 
-        assertThat(t1).isEqualTo(constrainedFunctionType);
+        assertThat(functionWithConstrainedDomain).isEqualTo(constrainedFunctionType);
+        assertThat(functionWithConstrainedRange).isEqualTo(constraint(
+                apply(apply(FUNCTION, var("b")), var("a")), typeClass("Eq", var("a"))
+        ));
+    }
+
+
+    @Test
+    public void multipleConstraintsAreComposedWhenApplyingType() throws Exception {
+
+        assertThat(apply(apply(FUNCTION, eqA), eqB)).isEqualTo(constraint(
+                apply(apply(FUNCTION, var("a")), var("b")),
+                typeClass("Eq", var("a")),
+                typeClass("Eq", var("b"))));
+
+        assertThat(apply(apply(FUNCTION, eqC),apply(apply(FUNCTION, eqA), eqB))).isEqualTo(constraint(
+                apply(apply(FUNCTION, var("c")), apply(apply(FUNCTION, var("a")), var("b"))),
+                typeClass("Eq", var("c")),
+                typeClass("Eq", var("a")),
+                typeClass("Eq", var("b"))));
+
     }
 
     @Ignore("constraints with typeclasses do not work (yet)")

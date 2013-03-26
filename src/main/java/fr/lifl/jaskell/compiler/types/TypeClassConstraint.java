@@ -1,6 +1,8 @@
 package fr.lifl.jaskell.compiler.types;
 
-public class TypeClassConstraint extends TypeConstraint {
+import java.util.List;
+
+public class TypeClassConstraint implements TypeConstraint {
     private final TypeClass typeClass;
     private final TypeVariable typeVariable;
 
@@ -15,6 +17,11 @@ public class TypeClassConstraint extends TypeConstraint {
     }
 
     @Override
+    public void collectTo(List<TypeConstraint> constraints) {
+        constraints.add(this);
+    }
+
+    @Override
     public String toString() {
         return typeClass + " " + typeVariable;
     }
@@ -26,10 +33,8 @@ public class TypeClassConstraint extends TypeConstraint {
 
         TypeClassConstraint that = (TypeClassConstraint) o;
 
-        if (!typeClass.equals(that.typeClass)) return false;
-        if (!typeVariable.equals(that.typeVariable)) return false;
+        return typeClass.equals(that.typeClass) && typeVariable.equals(that.typeVariable);
 
-        return true;
     }
 
     @Override
