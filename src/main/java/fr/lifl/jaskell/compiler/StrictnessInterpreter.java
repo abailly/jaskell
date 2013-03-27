@@ -220,7 +220,7 @@ public class StrictnessInterpreter extends AbstractInterpreter {
     public Object visit(Abstraction a) {
         JObject cur = (JObject) abstractions.get(a);
         if (cur == null) {
-            cur = new Combinator(a.getCount(), a, this);
+            cur = new Combinator(a.getCount(), a);
             abstractions.put(a, cur);
         }
         return cur;
@@ -315,15 +315,12 @@ public class StrictnessInterpreter extends AbstractInterpreter {
 
         Abstraction abs;
 
-        StrictnessInterpreter interp;
-
         /**
          * @param n
          */
-        public Combinator(int n, Abstraction abs, StrictnessInterpreter interp) {
+        public Combinator(int n, Abstraction abs) {
             super(n);
             this.abs = abs;
-            this.interp = interp;
         }
 
         /*
@@ -343,10 +340,10 @@ public class StrictnessInterpreter extends AbstractInterpreter {
                     Map.Entry entry = (Map.Entry) it.next();
                     entry.setValue(args[i++]);
                 }
-                interp.pushContext(vars);
+                pushContext(vars);
                 /* instantiate abs body and call eval on it */
-                JObject val = (JObject) abs.getBody().visit(interp);
-                interp.popContext();
+                JObject val = (JObject) abs.getBody().visit(StrictnessInterpreter.this);
+                popContext();
                 return val;
             }
 
@@ -358,7 +355,7 @@ public class StrictnessInterpreter extends AbstractInterpreter {
          * @see jaskell.runtime.types.JFunction#init()
          */
         public JFunction init() {
-            return new Combinator(maxargs, abs, interp);
+            return new Combinator(maxargs, abs);
         }
 
     }
