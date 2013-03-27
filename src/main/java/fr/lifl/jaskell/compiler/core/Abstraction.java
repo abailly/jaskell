@@ -10,7 +10,7 @@ import java.util.*;
 
 import fr.lifl.jaskell.compiler.JaskellVisitor;
 import fr.lifl.jaskell.compiler.types.Type;
-import fr.lifl.jaskell.compiler.types.TypeFactory;
+import fr.lifl.jaskell.compiler.types.Types;
 
 
 /**
@@ -151,8 +151,9 @@ public class Abstraction extends ExpressionBase implements Binder {
         if (type == null)
             return null;
         LocalBinding[] binds = (LocalBinding[]) indices.toArray(new LocalBinding[0]);
-        for (int i = binds.length; i > 0; i--)
-            type = TypeFactory.makeApplication(TypeFactory.makeApplication(Primitives.FUNCTION, binds[i - 1].getType()), type);
+        for (int i = binds.length; i > 0; i--) {
+            type = Types.makeApplication(Types.makeApplication(Primitives.FUNCTION, binds[i - 1].getType()), type);
+        }
         setType(type);
         return type;
     }

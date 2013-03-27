@@ -84,9 +84,9 @@ public class TypeInstantiator implements TypeVisitor {
 	}
 
 	public Object visit(TypeApplication typeApplication) {
-		Type ta = TypeFactory.makeApplication(
-			(Type) typeApplication.getDomain().visit(this),
-			(Type) typeApplication.getRange().visit(this));
+		Type ta = Types.makeApplication(
+                (Type) typeApplication.getDomain().visit(this),
+                (Type) typeApplication.getRange().visit(this));
 		return ta;
 	}
 

@@ -46,7 +46,7 @@ public class DataDefinition extends Definition {
      * Constructor for DataDefinition.
      */
     public DataDefinition(String name, Module mod) {
-        this(name, TypeFactory.makeTycon(name), mod);
+        this(name, Types.makeTycon(name), mod);
     }
 
     /**
@@ -59,7 +59,7 @@ public class DataDefinition extends Definition {
     public DataDefinition(String name, Type t, Module mod) {
         super(name, null, null, mod);
         if (t instanceof TypeApplication) {
-            TypeConstructor tc = (TypeConstructor) ((TypeApplication) t).getConstructor();
+            TypeConstructor tc = (TypeConstructor) t.getConstructor();
             /* construct kind */
             this.kind = tc.getKind();
         } else if (t instanceof TypeConstructor) {
@@ -96,16 +96,10 @@ public class DataDefinition extends Definition {
         return constructors;
     }
 
-    /**
-     * @see jaskell.compiler.core.Expression#visit(JaskellVisitor)
-     */
     public Object visit(JaskellVisitor v) {
         return v.visit(this);
     }
 
-    /**
-     * @see jaskell.compiler.core.Expression#getType()
-     */
     public Type getType() {
         return type;
     }

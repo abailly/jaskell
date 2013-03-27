@@ -1698,7 +1698,7 @@ public class Yyparser implements fr.lifl.parsing.Parser {
                 Type tcon = val_peek(1).getType().getConstructor();
                 if (!(tcon instanceof PrimitiveType))
                     tcon.setKind(null);
-                yyval = new TypeExpression(TypeFactory.makeApplication(val_peek(1).getType(), val_peek(0).getType()));
+                yyval = new TypeExpression(Types.apply(val_peek(1).getType(), val_peek(0).getType()));
             }
             break;
 
@@ -1737,14 +1737,14 @@ public class Yyparser implements fr.lifl.parsing.Parser {
                 }
                 /* make type constructor */
                 /* make type defintiion */
-                yyval = new TypeExpression(TypeFactory.makeApplication(PrimitiveType.makeTuple(i), l));
+                yyval = new TypeExpression(Types.makeApplication(PrimitiveType.makeTuple(i), l));
             }
             break;
 
             case 47:
 //#line 492 "jaskell-core.y"
             {
-                yyval = new TypeExpression(TypeFactory.makeApplication(Primitives.LIST, val_peek(1).getType()));
+                yyval = new TypeExpression(Types.apply(Primitives.LIST, val_peek(1).getType()));
             }
             break;
 
@@ -1758,7 +1758,7 @@ public class Yyparser implements fr.lifl.parsing.Parser {
             case 51:
 //#line 500 "jaskell-core.y"
             {
-                yyval = new TypeExpression(TypeFactory.makeTycon(((Constructor) val_peek(0)).getName()));
+                yyval = new TypeExpression(Types.makeTycon(((Constructor) val_peek(0)).getName()));
             }
             break;
 

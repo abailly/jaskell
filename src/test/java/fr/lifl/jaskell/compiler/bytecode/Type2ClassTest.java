@@ -3,7 +3,7 @@ import fr.lifl.jaskell.compiler.core.Module;
 import fr.lifl.jaskell.compiler.core.Primitives;
 import fr.lifl.jaskell.compiler.types.PrimitiveType;
 import fr.lifl.jaskell.compiler.types.Type;
-import fr.lifl.jaskell.compiler.types.TypeFactory;
+import fr.lifl.jaskell.compiler.types.Types;
 import junit.framework.TestCase;
 
 public class Type2ClassTest extends TestCase {
@@ -32,12 +32,12 @@ public class Type2ClassTest extends TestCase {
 	}
 
 	public void testListNameEncoding() {
-		Type lt = TypeFactory.makeApplication(Primitives.LIST, Primitives.INT);
+		Type lt = Types.makeApplication(Primitives.LIST, Primitives.INT);
 		assertEquals("_5bInt_5d", BytecodeGenerator.encodeName2Java(lt.toString()));
 	}
 
 	public void testListType() {
-		Type lt = TypeFactory.makeApplication(Primitives.LIST, Primitives.INT);
+		Type lt = Types.makeApplication(Primitives.LIST, Primitives.INT);
 		Type2Class tv = new Type2Class(Module.PRELUDE);
 		Class cls = (Class) lt.visit(tv);
 		ClassFileWriter writer = new ClassFileWriter("test");
@@ -46,13 +46,13 @@ public class Type2ClassTest extends TestCase {
 
 	public void testListType2() {
 		Type lt =
-			TypeFactory.makeApplication(
-				Primitives.LIST,
-				TypeFactory.makeApplication(
-					Primitives.LIST,
-					PrimitiveType.makeFunction(
-						Primitives.INT,
-						Primitives.STRING)));
+			Types.makeApplication(
+                    Primitives.LIST,
+                    Types.makeApplication(
+                            Primitives.LIST,
+                            PrimitiveType.makeFunction(
+                                    Primitives.INT,
+                                    Primitives.STRING)));
 		Type2Class tv = new Type2Class(Module.PRELUDE);
 		Class cls = (Class) lt.visit(tv);
 		ClassFileWriter writer = new ClassFileWriter("test");

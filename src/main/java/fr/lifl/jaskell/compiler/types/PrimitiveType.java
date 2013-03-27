@@ -21,7 +21,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
     //~ Static fields/initializers 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public static Map primitives = new HashMap();
+    public static final Map primitives = new HashMap();
 
     //~ ----------------------------------------------------------------------------------------------------------------
     //~ Instance fields 
@@ -106,7 +106,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
      * @param range the range of function
      */
     public static Type makeFunction(Type domain, Type range) {
-        return TypeFactory.makeApplication(TypeFactory.makeApplication(FUNCTION, domain), range);
+        return Types.makeApplication(Types.makeApplication(FUNCTION, domain), range);
     }
 
     /**
@@ -127,7 +127,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
                 sb.append(',');
         }
         sb.append("))");
-        return (TypeConstructor) TypeFactory.makeTycon(sb.toString(), k);
+        return (TypeConstructor) Types.makeTycon(sb.toString(), k);
     }
 
     /**
@@ -164,7 +164,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
      * @return
      */
     public static Type makeList(Type el) {
-        return TypeFactory.makeApplication(LIST, el);
+        return Types.makeApplication(LIST, el);
     }
 
     public <T> T visit(TypeVisitor<T> v) {
@@ -239,7 +239,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
             TypeApplication tmp = (TypeApplication) curFunction;
             Type dom = tmp.getDomain();
             Type rge = this.curFunction = tmp.getRange();
-            Type niou = TypeFactory.makeApplication(dom, rge);
+            Type niou = Types.makeApplication(dom, rge);
             return niou;
         }
 

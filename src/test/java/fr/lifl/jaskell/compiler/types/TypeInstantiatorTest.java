@@ -29,9 +29,9 @@ public class TypeInstantiatorTest extends TestCase {
 		Type v = TypeFactory.freshBinding();
 		Type v2 = TypeFactory.freshBinding();
 		Type t1 =
-			TypeFactory.makeApplication(
-				TypeFactory.makeApplication(FUNCTION, v),
-				v2);
+			Types.makeApplication(
+                    Types.makeApplication(FUNCTION, v),
+                    v2);
 		/* apply instance */
 		Type t = new TypeInstantiator(t1).instance();
 		System.err.println(

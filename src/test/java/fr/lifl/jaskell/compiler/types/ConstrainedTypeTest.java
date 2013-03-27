@@ -45,7 +45,6 @@ public class ConstrainedTypeTest {
 
     @Test
     public void multipleConstraintsAreComposedWhenApplyingType() throws Exception {
-
         assertThat(apply(apply(FUNCTION, eqA), eqB)).isEqualTo(constraint(
                 apply(apply(FUNCTION, var("a")), var("b")),
                 typeClass("Eq", var("a")),
@@ -56,9 +55,7 @@ public class ConstrainedTypeTest {
                 typeClass("Eq", var("c")),
                 typeClass("Eq", var("a")),
                 typeClass("Eq", var("b"))));
-
     }
-
 
     @Test
     public void redundantConstraintsAreIgnored() throws Exception {

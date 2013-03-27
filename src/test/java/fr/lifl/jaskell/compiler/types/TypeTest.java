@@ -196,7 +196,7 @@ public class TypeTest {
         /* (Eq a) => (a -> b) */
         t1.setContext(tctx);
         /* unify with a = [ t0 ] */
-        Type t2 = PrimitiveType.makeFunction(TypeFactory.makeApplication(LIST, TypeFactory.freshBinding()), INT);
+        Type t2 = PrimitiveType.makeFunction(Types.makeApplication(LIST, TypeFactory.freshBinding()), INT);
         t2.setContext(tctx);
         Type t3 = new TypeUnifier().unify(t1, t2, m);
         System.err.println("t3 : " + t3 + ", subst : " + m);

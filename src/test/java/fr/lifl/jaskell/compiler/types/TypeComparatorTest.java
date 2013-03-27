@@ -14,8 +14,6 @@
  *
  */
 package fr.lifl.jaskell.compiler.types;
-import fr.lifl.jaskell.compiler.core.Expression;
-import fr.lifl.jaskell.compiler.core.Module;
 import fr.lifl.jaskell.compiler.core.Primitives;
 import junit.framework.TestCase;
 
@@ -57,8 +55,8 @@ public class TypeComparatorTest extends TestCase {
 	}
 	
 	public void testList() throws Exception {
-		Type t1 = TypeFactory.makeApplication(Primitives.LIST,Primitives.INT);
-		Type t2 = TypeFactory.makeApplication(Primitives.LIST,TypeFactory.freshBinding());
+		Type t1 = Types.makeApplication(Primitives.LIST, Primitives.INT);
+		Type t2 = Types.makeApplication(Primitives.LIST, TypeFactory.freshBinding());
 		assertEquals(0,t1.compare(t2));
 		assertEquals(0,t2.compare(t1));
 	}
