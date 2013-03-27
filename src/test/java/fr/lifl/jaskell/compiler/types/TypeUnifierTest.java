@@ -1,6 +1,5 @@
 package fr.lifl.jaskell.compiler.types;
 
-import fr.lifl.jaskell.compiler.core.Primitives;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 import static fr.lifl.jaskell.compiler.core.Primitives.BOOL;
 import static fr.lifl.jaskell.compiler.types.Types.*;
+import static fr.lifl.jaskell.compiler.types.Types.apply;
 import static org.fest.assertions.Assertions.assertThat;
 
 public class TypeUnifierTest {
@@ -45,21 +45,21 @@ public class TypeUnifierTest {
         assertThat(unifier.unify(a, f, map)).isEqualTo(f);
         assertThat(map.get(a)).isEqualTo(f);
 
-        assertThat(unifier.unify(f, a,map)).isEqualTo(f);
+        assertThat(unifier.unify(f, a, map)).isEqualTo(f);
         assertThat(map.get(a)).isEqualTo(f);
     }
 
     @Test
     public void unifiesTwoFunctionsMapsVariablesToPrimitives() throws Exception {
         Map<Type, Type> map = newHashMap();
-        assertThat(unifier.unify(fun(a,b), fun(BOOL,BOOL), map)).isEqualTo(fun(BOOL,BOOL));
+        assertThat(unifier.unify(fun(a, b), fun(BOOL, BOOL), map)).isEqualTo(fun(BOOL, BOOL));
         assertThat(map.get(a)).isEqualTo(BOOL);
         assertThat(map.get(b)).isEqualTo(BOOL);
     }
 
     @Test(expected = TypeError.class)
     public void cannotUnifyAVariableAndAFunctionWithSameVariable() throws Exception {
-        unifier.unify(a,fun(a,b),newHashMap());
+        unifier.unify(a, fun(a, b), newHashMap());
     }
 
     @Test
@@ -67,13 +67,26 @@ public class TypeUnifierTest {
         Map<Type, Type> map = newHashMap();
         Type eqB = constraint(b, typeClass("Eq", b));
         Type eqA = constraint(a, typeClass("Eq", a));
-        
+
         assertThat(unifier.unify(a, eqB, map)).isEqualTo(eqB);
         assertThat(map.get(a)).isEqualTo(eqB);
-        
+
         map = newHashMap();
         assertThat(unifier.unify(eqB, a, map)).isEqualTo(eqA);
         assertThat(map.get(b)).isEqualTo(a);
     }
 
+    @Test
+    public void propagatesRangeSubstitutionToDomainWhenUnifyingTypeApplication() throws Exception {
+        assertThat(unifier.unify(fun(a, a), fun(b, BOOL),newHashMap())).isEqualTo(fun(BOOL, BOOL));
+    }
+
+    @Test
+    public void unifiesConstrainedTypeWithPrimitiveTypes() throws Exception {
+        Type t = var("t");
+        Type eqTA = constraint(fun(apply(t, a), a), typeClass("Eq", apply(t, a)));
+        Type f = fun(b, BOOL);
+        
+        assertThat(unifier.unify(eqTA,f,newHashMap())).isEqualTo(constraint(fun(apply(t, BOOL), BOOL), typeClass("Eq", apply(t, BOOL))));
+    }
 }

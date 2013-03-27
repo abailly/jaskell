@@ -109,7 +109,7 @@ public class TypeUnifier implements TypeVisitor {
                             subst.substitute(typeApplication.getRange()),
                             ta.getRange(),
                             map);
-            return new TypeApplication(dom, rge);
+            return new TypeApplication(subst.substitute(dom), rge);
         } else if (to instanceof TypeVariable) {
             return unify(to, typeApplication, map);
         } else {
