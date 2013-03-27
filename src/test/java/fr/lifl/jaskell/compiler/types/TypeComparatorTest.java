@@ -65,8 +65,8 @@ public class TypeComparatorTest extends TestCase {
 	 * (Int -> a) <  (a -> b)
 	 */
 	public void testFunction() throws Exception {
-		Type t1 = PrimitiveType.makeFunction(Primitives.INT,TypeFactory.freshBinding());
-		Type t2 = PrimitiveType.makeFunction(TypeFactory.freshBinding(),TypeFactory.freshBinding());
+		Type t1 = Types.fun(Primitives.INT, TypeFactory.freshBinding());
+		Type t2 = Types.fun(TypeFactory.freshBinding(), TypeFactory.freshBinding());
 		assertEquals(0,t1.compare(t2));
 		assertEquals(0,t2.compare(t1));
 	}

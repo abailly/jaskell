@@ -1,6 +1,7 @@
 package fr.lifl.jaskell.compiler.types;
 
 import com.google.common.collect.Sets;
+import org.omg.CORBA.ContextList;
 
 import java.util.Set;
 
@@ -46,5 +47,18 @@ public class TypeConstraintsBuilder {
             constraint.collectTo(flattened);
         }
         return flattened;
+    }
+
+    public TypeConstraintsBuilder add(TypeConstraint constraint) {
+        constraint.collectTo(constraints);
+        return this;
+    }
+
+    public TypeConstraintsBuilder add(TypeClassConstraint[] addedConstraints) {
+        for (TypeClassConstraint constraint : addedConstraints) {
+            constraint.collectTo(constraints);
+        }
+
+        return this;
     }
 }

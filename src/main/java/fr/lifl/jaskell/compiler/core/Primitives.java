@@ -1,9 +1,3 @@
-/**
- *  Copyright Murex S.A.S., 2003-2013. All Rights Reserved.
- * 
- *  This software program is proprietary and confidential to Murex S.A.S and its affiliates ("Murex") and, without limiting the generality of the foregoing reservation of rights, shall not be accessed, used, reproduced or distributed without the
- *  express prior written consent of Murex and subject to the applicable Murex licensing terms. Any modification or removal of this copyright notice is expressly prohibited.
- */
 package fr.lifl.jaskell.compiler.core;
 
 import fr.lifl.jaskell.compiler.datatypes.ConstructorDefinition;
@@ -22,10 +16,6 @@ import fr.lifl.jaskell.runtime.types.*;
  * @version $Id: Primitives.java 1154 2005-11-24 21:43:37Z nono $
  */
 public interface Primitives {
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-    //~ Instance fields 
-    //~ ----------------------------------------------------------------------------------------------------------------
 
     /** primitive types */
     /** Type constants for builtin atomic types */
@@ -128,17 +118,17 @@ public interface Primitives {
     Type VAR_2 = TypeFactory.freshBinding();
 
     /* useful function types */
-    Type INT_INT = PrimitiveType.makeFunction(INT, INT);
+    Type INT_INT = Types.fun(INT, INT);
 
-    Type INT_INT_INT = PrimitiveType.makeFunction(INT, PrimitiveType.makeFunction(INT, INT));
+    Type INT_INT_INT = Types.fun(INT, Types.fun(INT, INT));
 
-    Type FLOAT_FLOAT_FLOAT = PrimitiveType.makeFunction(FLOAT, PrimitiveType.makeFunction(FLOAT, FLOAT));
+    Type FLOAT_FLOAT_FLOAT = Types.fun(FLOAT, Types.fun(FLOAT, FLOAT));
 
-    Type FLOAT_FLOAT = PrimitiveType.makeFunction(FLOAT, FLOAT);
+    Type FLOAT_FLOAT = Types.fun(FLOAT, FLOAT);
 
-    Type BOOL_BOOL = PrimitiveType.makeFunction(BOOL, BOOL);
+    Type BOOL_BOOL = Types.fun(BOOL, BOOL);
 
-    Type BOOL_BOOL_BOOL = PrimitiveType.makeFunction(BOOL, PrimitiveType.makeFunction(BOOL, BOOL));
+    Type BOOL_BOOL_BOOL = Types.fun(BOOL, Types.fun(BOOL, BOOL));
 
     /*
      * public static final Type FLOAT_FLOAT = PrimitiveType.makeFunction(FLOAT,
@@ -146,9 +136,9 @@ public interface Primitives {
      * PrimitiveType.makeFunction(FLOAT, PrimitiveType.makeFunction(FLOAT,
      * FLOAT));
      */
-    Type INT_INT_BOOL = PrimitiveType.makeFunction(INT, PrimitiveType.makeFunction(INT, BOOL));
+    Type INT_INT_BOOL = Types.fun(INT, Types.fun(INT, BOOL));
 
-    Type FLOAT_FLOAT_BOOL = PrimitiveType.makeFunction(FLOAT, PrimitiveType.makeFunction(FLOAT, BOOL));
+    Type FLOAT_FLOAT_BOOL = Types.fun(FLOAT, Types.fun(FLOAT, BOOL));
 
     /** primitive data definitions */
     DataDefinition DATA_LIST = new PrimitiveData("([])", Types.apply(LIST, VAR_A), JList.class, Module.PRELUDE);
@@ -206,7 +196,7 @@ public interface Primitives {
 
     PrimitiveFunction NOT = new PrimitiveFunction("not", Module.PRELUDE, BOOL_BOOL, null);
 
-    PrimitiveFunction SEQ = new PrimitiveFunction("seq", Module.PRELUDE, PrimitiveType.makeFunction(TypeFactory.freshBinding(), PrimitiveType.makeFunction(VAR_1, VAR_1)), Prelude.class);
+    PrimitiveFunction SEQ = new PrimitiveFunction("seq", Module.PRELUDE, Types.fun(TypeFactory.freshBinding(), Types.fun(VAR_1, VAR_1)), Prelude.class);
 
     PrimitiveFunction NEG_INT = new PrimitiveFunction("negate", Module.PRELUDE, INT_INT, null);
 

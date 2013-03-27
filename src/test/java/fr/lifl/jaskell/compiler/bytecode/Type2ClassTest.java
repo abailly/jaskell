@@ -1,7 +1,6 @@
 package fr.lifl.jaskell.compiler.bytecode;
 import fr.lifl.jaskell.compiler.core.Module;
 import fr.lifl.jaskell.compiler.core.Primitives;
-import fr.lifl.jaskell.compiler.types.PrimitiveType;
 import fr.lifl.jaskell.compiler.types.Type;
 import fr.lifl.jaskell.compiler.types.Types;
 import junit.framework.TestCase;
@@ -13,7 +12,7 @@ public class Type2ClassTest extends TestCase {
 	}
 
 	public void testType() {
-		Type t2 = PrimitiveType.makeFunction(Primitives.INT, Primitives.BOOL);
+		Type t2 = Types.fun(Primitives.INT, Primitives.BOOL);
 		Type2Class tv = new Type2Class(Module.PRELUDE);
 		Class cls = (Class) t2.visit(tv);
 		assertEquals(fr.lifl.jaskell.runtime.types.Closure.class, cls);
@@ -21,9 +20,9 @@ public class Type2ClassTest extends TestCase {
 
 	public void testTypeGen01() {
 		Type t2 =
-			PrimitiveType.makeFunction(
-				Primitives.INT,
-				PrimitiveType.makeFunction(Primitives.INT, Primitives.BOOL));
+			Types.fun(
+                    Primitives.INT,
+                    Types.fun(Primitives.INT, Primitives.BOOL));
 		Type2Class tv = new Type2Class(Module.PRELUDE);
 		Class cls = (Class) t2.visit(tv);
 		assertEquals(
@@ -50,7 +49,7 @@ public class Type2ClassTest extends TestCase {
                     Primitives.LIST,
                     Types.apply(
                             Primitives.LIST,
-                            PrimitiveType.makeFunction(
+                            Types.fun(
                                     Primitives.INT,
                                     Primitives.STRING)));
 		Type2Class tv = new Type2Class(Module.PRELUDE);

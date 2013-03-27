@@ -99,52 +99,6 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
     }
 
     /**
-     * A method to create simply function types This factory method is used to create function types from an domain and
-     * range types
-     *
-     * @param domain   the domain of function
-     * @param range the range of function
-     */
-    public static Type makeFunction(Type domain, Type range) {
-        return Types.apply(Types.apply(FUNCTION, domain), range);
-    }
-
-    /**
-     * Create a type constructor for given tuple size
-     *
-     * @param  n the size of the tuple type to create
-     *
-     * @return a type constructor for this tuple size
-     */
-    public static TypeConstructor makeTuple(int n) {
-        if (n < 2)
-            throw new TypeError("Cannot make tuples with less than two elements");
-        StringBuffer sb = new StringBuffer("Prelude.((");
-        Kind k = SimpleKind.K;
-        for (int i = 0; i < n; i++) {
-            k = new FunctionKind(SimpleKind.K, k);
-            if (i < (n - 1))
-                sb.append(',');
-        }
-        sb.append("))");
-        return (TypeConstructor) Types.makeTycon(sb.toString(), k);
-    }
-
-    /**
-     * Creates a function type from a list of arguments and a return type
-     *
-     * @param args a list of type arguments
-     * @param ret  type of return
-     */
-    public static Type makeFunction(List args, Type ret) {
-        Iterator it = args.iterator();
-        Type t = ret;
-        for (int i = args.size() - 1; i >= 0; i--)
-            t = makeFunction((Type) args.get(i), t);
-        return t;
-    }
-
-    /**
      * Method getReturnType.
      *
      * @param  uni

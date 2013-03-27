@@ -6,8 +6,8 @@ import fr.lifl.jaskell.compiler.LambdaLifter;
 import fr.lifl.jaskell.compiler.StrictnessAnalyzer;
 import fr.lifl.jaskell.compiler.TypeChecker;
 import fr.lifl.jaskell.compiler.core.*;
-import fr.lifl.jaskell.compiler.types.PrimitiveType;
 import fr.lifl.jaskell.compiler.types.Type;
+import fr.lifl.jaskell.compiler.types.Types;
 import fr.lifl.jaskell.parser.Yyparser;
 
 import junit.framework.TestCase;
@@ -42,8 +42,8 @@ public class CodeGeneratorTest extends TestCase {
     public void testApplication() {
         Module m = new Module("Main", null);
         // definitions des Types
-        Type f1 = PrimitiveType.makeFunction(Primitives.INT, Primitives.INT);
-        Type f2 = PrimitiveType.makeFunction(f1, f1);
+        Type f1 = Types.fun(Primitives.INT, Primitives.INT);
+        Type f2 = Types.fun(f1, f1);
         // definition de g
         Abstraction a1 = new Abstraction();
         a1.setType(Primitives.INT_INT_INT);
@@ -134,7 +134,7 @@ public class CodeGeneratorTest extends TestCase {
 
     public void testFac() {
         Module m = new Module("Main", null);
-        Type f1 = PrimitiveType.makeFunction(Primitives.INT, Primitives.INT);
+        Type f1 = Types.fun(Primitives.INT, Primitives.INT);
         // definition de g
         Abstraction a1 = new Abstraction();
         a1.bind(new LocalBinding("x"));

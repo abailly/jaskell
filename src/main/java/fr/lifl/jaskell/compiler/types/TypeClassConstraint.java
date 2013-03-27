@@ -1,19 +1,20 @@
 package fr.lifl.jaskell.compiler.types;
 
+import java.util.Map;
 import java.util.Set;
 
 public class TypeClassConstraint implements TypeConstraint {
     private final TypeClass typeClass;
-    private final TypeVariable typeVariable;
+    private final Type type;
 
-    public TypeClassConstraint(TypeClass typeClass, TypeVariable typeVariable) {
+    public TypeClassConstraint(TypeClass typeClass, Type type) {
         this.typeClass = typeClass;
-        this.typeVariable = typeVariable;
+        this.type = type;
     }
 
     @Override
     public boolean containsVariable(TypeVariable variableType) {
-        return typeVariable.equals(variableType);
+        return type.equals(variableType);
     }
 
     @Override
@@ -22,8 +23,17 @@ public class TypeClassConstraint implements TypeConstraint {
     }
 
     @Override
+    public TypeConstraint substitute(Map<Type, Type> map) {
+        if(map.get(type) == null) {
+            return this;
+        }
+        
+        return new TypeClassConstraint(typeClass,map.get(type));
+    }
+
+    @Override
     public String toString() {
-        return typeClass + " " + typeVariable;
+        return typeClass + " " + type;
     }
 
     @Override
@@ -33,14 +43,14 @@ public class TypeClassConstraint implements TypeConstraint {
 
         TypeClassConstraint that = (TypeClassConstraint) o;
 
-        return typeClass.equals(that.typeClass) && typeVariable.equals(that.typeVariable);
+        return typeClass.equals(that.typeClass) && type.equals(that.type);
 
     }
 
     @Override
     public int hashCode() {
         int result = typeClass.hashCode();
-        result = 31 * result + typeVariable.hashCode();
+        result = 31 * result + type.hashCode();
         return result;
     }
 }

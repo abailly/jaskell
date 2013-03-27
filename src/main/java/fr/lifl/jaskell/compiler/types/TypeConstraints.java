@@ -1,22 +1,27 @@
 package fr.lifl.jaskell.compiler.types;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.Function;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class TypeConstraints implements TypeConstraint {
 
     private final Set<TypeConstraint> constraints;
 
     public TypeConstraints(TypeConstraint constraint, TypeConstraint... constraints) {
-        this.constraints = Sets.newHashSet();
+        this.constraints = newHashSet();
         this.constraints.add(constraint);
         Collections.addAll(this.constraints, constraints);
     }
 
     public TypeConstraints(Set<TypeConstraint> constraints) {
-        this.constraints = Sets.newHashSet(constraints);
+        this.constraints = newHashSet(constraints);
     }
 
     @Override
@@ -33,6 +38,20 @@ public class TypeConstraints implements TypeConstraint {
         for (TypeConstraint constraint : this.constraints) {
             constraint.collectTo(constraints);
         }
+    }
+
+    @Override
+    public TypeConstraint substitute(Map<Type, Type> map) {
+        return new TypeConstraints(newHashSet(transform(constraints, substituteTypes(map))));
+    }
+
+    private Function<TypeConstraint, TypeConstraint> substituteTypes(final Map<Type, Type> map) {
+        return new Function<TypeConstraint, TypeConstraint>() {
+            @Override
+            public TypeConstraint apply(@Nullable TypeConstraint input) {
+                return input.substitute(map);
+            }
+        };
     }
 
     @Override

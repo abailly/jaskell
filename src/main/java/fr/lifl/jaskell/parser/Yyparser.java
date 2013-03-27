@@ -1680,7 +1680,7 @@ public class Yyparser implements fr.lifl.parsing.Parser {
             case 40:
 //#line 456 "jaskell-core.y"
             {
-                yyval = new TypeExpression(PrimitiveType.makeFunction(val_peek(2).getType(), val_peek(0).getType()));
+                yyval = new TypeExpression(Types.fun(val_peek(2).getType(), val_peek(0).getType()));
             }
             break;
 
@@ -1737,7 +1737,7 @@ public class Yyparser implements fr.lifl.parsing.Parser {
                 }
                 /* make type constructor */
                 /* make type defintiion */
-                yyval = new TypeExpression(Types.makeApplication(PrimitiveType.makeTuple(i), l));
+                yyval = new TypeExpression(Types.apply(Types.tuple(i), l));
             }
             break;
 

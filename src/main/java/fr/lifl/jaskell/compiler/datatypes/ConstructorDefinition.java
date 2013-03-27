@@ -13,8 +13,8 @@ import fr.lifl.jaskell.compiler.core.Binder;
 import fr.lifl.jaskell.compiler.core.Definition;
 import fr.lifl.jaskell.compiler.core.Expression;
 import fr.lifl.jaskell.compiler.core.Module;
-import fr.lifl.jaskell.compiler.types.PrimitiveType;
 import fr.lifl.jaskell.compiler.types.Type;
+import fr.lifl.jaskell.compiler.types.Types;
 
 
 /**
@@ -144,7 +144,7 @@ public class ConstructorDefinition extends Definition implements Binder {
             return null;
         Type[] binds = (Type[]) parameters.toArray(new Type[0]);
         for (int i = binds.length; i > 0; i--)
-            ret = PrimitiveType.makeFunction(binds[i - 1], ret);
+            ret = Types.fun(binds[i - 1], ret);
         setType(ret);
         return ret;
     }

@@ -90,7 +90,7 @@ public class TypeTest {
         Type a = new TypeVariable("a");
         Type b = new TypeVariable("b");
         Type c = new TypeVariable("c");
-        Type t = PrimitiveType.makeFunction(PrimitiveType.makeFunction(a, b), c);
+        Type t = Types.fun(Types.fun(a, b), c);
         assertEquals("((a -> b) -> c)", t.makeString());
     }
 
@@ -110,9 +110,9 @@ public class TypeTest {
         Type a = new TypeVariable("a");
         Type b = new TypeVariable("b");
         Type c = new TypeVariable("c");
-        Type t = PrimitiveType.makeFunction(PrimitiveType.makeFunction(a, b), c);
+        Type t = Types.fun(Types.fun(a, b), c);
         Type i = INT;
-        Type t1 = PrimitiveType.makeFunction(PrimitiveType.makeFunction(i, i), i);
+        Type t1 = Types.fun(Types.fun(i, i), i);
         Type t3 = new TypeUnifier().unify(t, t1, new HashMap());
         assertEquals(t1, t3);
     }
@@ -121,10 +121,10 @@ public class TypeTest {
     public void testUnification2() {
         Type a = new TypeVariable("a");
         Type b = new TypeVariable("b");
-        Type t = PrimitiveType.makeFunction(a, b);
+        Type t = Types.fun(a, b);
         Type i = INT;
         Map m = new HashMap();
-        Type t1 = PrimitiveType.makeFunction(PrimitiveType.makeFunction(i, i), i);
+        Type t1 = Types.fun(Types.fun(i, i), i);
         Type t3 = new TypeUnifier().unify(t, t1, m);
         assertEquals(t1, t3);
         System.err.println("subst : " + m);
@@ -147,7 +147,7 @@ public class TypeTest {
         /* (Eq a) => (a -> b) */
         t1.setContext(tctx);
         /* unify with a = INT */
-        Type t2 = PrimitiveType.makeFunction(INT, INT);
+        Type t2 = Types.fun(INT, INT);
         t2.setContext(tctx);
         Type t3 = new TypeUnifier().unify(t1, t2, m);
         System.err.println("t3 : " + t3 + ", subst : " + m);
@@ -170,7 +170,7 @@ public class TypeTest {
         /* (Eq a) => (a -> b) */
         t1.setContext(tctx);
         /* unify with a = INT */
-        Type t2 = PrimitiveType.makeFunction(INT, INT);
+        Type t2 = Types.fun(INT, INT);
         t2.setContext(tctx);
         try {
             new TypeUnifier().unify(t1, t2, m);
@@ -196,7 +196,7 @@ public class TypeTest {
         /* (Eq a) => (a -> b) */
         t1.setContext(tctx);
         /* unify with a = [ t0 ] */
-        Type t2 = PrimitiveType.makeFunction(Types.apply(LIST, TypeFactory.freshBinding()), INT);
+        Type t2 = Types.fun(Types.apply(LIST, TypeFactory.freshBinding()), INT);
         t2.setContext(tctx);
         Type t3 = new TypeUnifier().unify(t1, t2, m);
         System.err.println("t3 : " + t3 + ", subst : " + m);

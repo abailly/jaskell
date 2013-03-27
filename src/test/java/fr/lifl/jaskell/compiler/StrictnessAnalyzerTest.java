@@ -1,8 +1,8 @@
 package fr.lifl.jaskell.compiler;
 
 import fr.lifl.jaskell.compiler.core.*;
-import fr.lifl.jaskell.compiler.types.PrimitiveType;
 import fr.lifl.jaskell.compiler.types.Type;
+import fr.lifl.jaskell.compiler.types.Types;
 import fr.lifl.jaskell.parser.Yyparser;
 import junit.framework.TestCase;
 
@@ -51,11 +51,11 @@ public class StrictnessAnalyzerTest extends TestCase {
     public void testPropagate() {
         Module m = new Module("Main", null);
         Type f1 =
-                PrimitiveType.makeFunction(
+                Types.fun(
                         Primitives.INT,
-                        PrimitiveType.makeFunction(
+                        Types.fun(
                                 Primitives.INT,
-                                PrimitiveType.makeFunction(
+                                Types.fun(
                                         Primitives.INT,
                                         Primitives.INT)));
         // definition de g	
@@ -99,7 +99,7 @@ public class StrictnessAnalyzerTest extends TestCase {
     public void testPartialFunctionApplication() {
         Module m = new Module("Main", null);
         // definitions des Types
-        Type f1 = PrimitiveType.makeFunction(Primitives.INT, Primitives.INT);
+        Type f1 = Types.fun(Primitives.INT, Primitives.INT);
         // definition de g	
         Abstraction a1 = new Abstraction();
         a1.setType(f1);

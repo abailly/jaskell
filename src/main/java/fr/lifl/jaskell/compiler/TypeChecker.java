@@ -97,7 +97,7 @@ public class TypeChecker extends CompilerPass {
             }
             Type tv = TypeFactory.freshBinding();
             /* create type with all variables for function */
-            Type ft = PrimitiveType.makeFunction(tl, tv);
+            Type ft = Types.fun(tl, tv);
             log.finer("In abstraction, setting type to " + ft);
             a.setType(ft);
             /* analyze body */
@@ -186,7 +186,7 @@ public class TypeChecker extends CompilerPass {
                 l.add((Type) e.visit(this));
             }
             Type vt = TypeFactory.freshBinding();
-            Type ft = PrimitiveType.makeFunction(l, vt);
+            Type ft = Types.fun(l, vt);
             log.finer("TypeChecker => In application " + a + ", type is " + ft);
             /* apply substitution on both types */
             ft = subst.substitute(ft);
