@@ -1,6 +1,5 @@
 package fr.lifl.jaskell.compiler.types;
 
-import java.util.Map;
 import java.util.Set;
 
 public class TypeClassConstraint implements TypeConstraint {
@@ -23,12 +22,8 @@ public class TypeClassConstraint implements TypeConstraint {
     }
 
     @Override
-    public TypeConstraint substitute(Map<Type, Type> map) {
-        if(map.get(type) == null) {
-            return this;
-        }
-        
-        return new TypeClassConstraint(typeClass,map.get(type));
+    public TypeConstraint substitute(TypeSubstitution map) {
+        return new TypeClassConstraint(typeClass,map.substitute(type));
     }
 
     @Override

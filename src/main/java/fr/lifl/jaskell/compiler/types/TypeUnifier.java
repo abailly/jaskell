@@ -132,7 +132,7 @@ public class TypeUnifier implements TypeVisitor {
     @Override
     public Object visit(ConstrainedType constrainedType) {
         Type unified = unify(constrainedType.getBaseType(),to, map);
-        TypeConstraint constraint = constrainedType.getTypeConstraint().substitute(map);
+        TypeConstraint constraint = constrainedType.getTypeConstraint().substitute(subst);
         return Types.constraint(unified,constraint);
     }
 

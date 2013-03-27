@@ -11,8 +11,9 @@ public interface TypeConstraint {
     /**
      * Applies a mapping to this constraint replacing all occurrences of mapped type by their image.
      * 
+     *
      * @param map a substitution from Types to Types
      * @return an updated TypeConstraint
      */
-    TypeConstraint substitute(Map<Type,Type> map);
+    TypeConstraint substitute(TypeSubstitution map);
 }

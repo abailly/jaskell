@@ -41,11 +41,11 @@ public class TypeConstraints implements TypeConstraint {
     }
 
     @Override
-    public TypeConstraint substitute(Map<Type, Type> map) {
+    public TypeConstraint substitute(TypeSubstitution map) {
         return new TypeConstraints(newHashSet(transform(constraints, substituteTypes(map))));
     }
 
-    private Function<TypeConstraint, TypeConstraint> substituteTypes(final Map<Type, Type> map) {
+    private Function<TypeConstraint, TypeConstraint> substituteTypes(final TypeSubstitution map) {
         return new Function<TypeConstraint, TypeConstraint>() {
             @Override
             public TypeConstraint apply(@Nullable TypeConstraint input) {

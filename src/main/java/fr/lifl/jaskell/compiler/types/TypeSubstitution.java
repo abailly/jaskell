@@ -17,7 +17,7 @@ public class TypeSubstitution implements TypeVisitor<Type> {
     }
 
     public TypeSubstitution(Map<TypeVariable,Type> map) {
-        this.map = ImmutableMap.copyOf(map);
+        this.map = map;
     }
 
     /**
