@@ -55,8 +55,8 @@ public class TypeComparatorTest extends TestCase {
 	}
 	
 	public void testList() throws Exception {
-		Type t1 = Types.makeApplication(Primitives.LIST, Primitives.INT);
-		Type t2 = Types.makeApplication(Primitives.LIST, TypeFactory.freshBinding());
+		Type t1 = Types.apply(Primitives.LIST, Primitives.INT);
+		Type t2 = Types.apply(Primitives.LIST, TypeFactory.freshBinding());
 		assertEquals(0,t1.compare(t2));
 		assertEquals(0,t2.compare(t1));
 	}

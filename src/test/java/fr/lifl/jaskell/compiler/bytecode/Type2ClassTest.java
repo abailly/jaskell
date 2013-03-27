@@ -32,12 +32,12 @@ public class Type2ClassTest extends TestCase {
 	}
 
 	public void testListNameEncoding() {
-		Type lt = Types.makeApplication(Primitives.LIST, Primitives.INT);
+		Type lt = Types.apply(Primitives.LIST, Primitives.INT);
 		assertEquals("_5bInt_5d", BytecodeGenerator.encodeName2Java(lt.toString()));
 	}
 
 	public void testListType() {
-		Type lt = Types.makeApplication(Primitives.LIST, Primitives.INT);
+		Type lt = Types.apply(Primitives.LIST, Primitives.INT);
 		Type2Class tv = new Type2Class(Module.PRELUDE);
 		Class cls = (Class) lt.visit(tv);
 		ClassFileWriter writer = new ClassFileWriter("test");
@@ -46,9 +46,9 @@ public class Type2ClassTest extends TestCase {
 
 	public void testListType2() {
 		Type lt =
-			Types.makeApplication(
+			Types.apply(
                     Primitives.LIST,
-                    Types.makeApplication(
+                    Types.apply(
                             Primitives.LIST,
                             PrimitiveType.makeFunction(
                                     Primitives.INT,

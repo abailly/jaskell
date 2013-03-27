@@ -152,7 +152,7 @@ public class Abstraction extends ExpressionBase implements Binder {
             return null;
         LocalBinding[] binds = (LocalBinding[]) indices.toArray(new LocalBinding[0]);
         for (int i = binds.length; i > 0; i--) {
-            type = Types.makeApplication(Types.makeApplication(Primitives.FUNCTION, binds[i - 1].getType()), type);
+            type = Types.apply(Types.apply(Primitives.FUNCTION, binds[i - 1].getType()), type);
         }
         setType(type);
         return type;

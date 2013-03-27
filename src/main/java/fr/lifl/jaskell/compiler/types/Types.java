@@ -83,20 +83,6 @@ public class Types {
 	}
 
     /**
-     * Construct a new type by making application between
-     * type <code>fun</code> and type <code>arg</code>. In 
-     * the process, constraints are collected and grouped
-     * and kind of types is checked.
-     * 
-     * @param fun
-     * @param arg
-     * @return a new Type object
-     */
-    public static Type makeApplication(Type fun, Type arg) {
-        return apply(fun,arg);
-    }
-
-    /**
      * Create a new Type application with given type constructor and arguments
      *
      * @param tycon a Type used as TyepConstrcutor
@@ -106,9 +92,9 @@ public class Types {
         if (args == null || args.size() == 0)
             throw new TypeError("Cannot construct application with empty arguments");
         Iterator it = args.iterator();
-        Type st = makeApplication(tycon, (Type) it.next());
+        Type st = apply(tycon, (Type) it.next());
         while (it.hasNext()) {
-            st = makeApplication(st, (Type) it.next());
+            st = apply(st, (Type) it.next());
         }
         return st;
     }

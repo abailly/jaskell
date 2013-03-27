@@ -106,7 +106,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
      * @param range the range of function
      */
     public static Type makeFunction(Type domain, Type range) {
-        return Types.makeApplication(Types.makeApplication(FUNCTION, domain), range);
+        return Types.apply(Types.apply(FUNCTION, domain), range);
     }
 
     /**
@@ -164,7 +164,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
      * @return
      */
     public static Type makeList(Type el) {
-        return Types.makeApplication(LIST, el);
+        return Types.apply(LIST, el);
     }
 
     public <T> T visit(TypeVisitor<T> v) {
@@ -239,7 +239,7 @@ public class PrimitiveType extends TypeConstructor implements Primitives {
             TypeApplication tmp = (TypeApplication) curFunction;
             Type dom = tmp.getDomain();
             Type rge = this.curFunction = tmp.getRange();
-            Type niou = Types.makeApplication(dom, rge);
+            Type niou = Types.apply(dom, rge);
             return niou;
         }
 

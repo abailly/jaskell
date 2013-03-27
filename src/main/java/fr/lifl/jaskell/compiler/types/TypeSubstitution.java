@@ -45,7 +45,7 @@ public class TypeSubstitution implements TypeVisitor<Type> {
     }
 
     public Type visit(TypeApplication typeApplication) {
-        return Types.makeApplication(
+        return Types.apply(
                 typeApplication.getDomain().visit(this),
                 typeApplication.getRange().visit(this));
     }
