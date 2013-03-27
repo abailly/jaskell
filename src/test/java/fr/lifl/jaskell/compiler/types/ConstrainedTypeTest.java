@@ -59,6 +59,14 @@ public class ConstrainedTypeTest {
 
     }
 
+
+    @Test
+    public void redundantConstraintsAreIgnored() throws Exception {
+        assertThat(apply(apply(FUNCTION, eqA), eqA)).isEqualTo(constraint(
+                apply(apply(FUNCTION, var("a")), var("a")),
+                typeClass("Eq", var("a"))));
+    }
+
     @Ignore("constraints with typeclasses do not work (yet)")
     @Test
     public void testConstraint2() {

@@ -1,24 +1,22 @@
 package fr.lifl.jaskell.compiler.types;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.util.Collections;
-import java.util.List;
-
-import static com.google.common.collect.Lists.newArrayList;
+import java.util.Set;
 
 public class TypeConstraints implements TypeConstraint {
 
-    private final List<TypeConstraint> constraints;
+    private final Set<TypeConstraint> constraints;
 
     public TypeConstraints(TypeConstraint constraint, TypeConstraint... constraints) {
-        this.constraints = newArrayList();
+        this.constraints = Sets.newHashSet();
         this.constraints.add(constraint);
         Collections.addAll(this.constraints, constraints);
     }
 
-    public TypeConstraints(List<TypeConstraint> constraints) {
-        this.constraints = Lists.newArrayList(constraints);
+    public TypeConstraints(Set<TypeConstraint> constraints) {
+        this.constraints = Sets.newHashSet(constraints);
     }
 
     @Override
@@ -31,7 +29,7 @@ public class TypeConstraints implements TypeConstraint {
     }
 
     @Override
-    public void collectTo(List<TypeConstraint> constraints) {
+    public void collectTo(Set<TypeConstraint> constraints) {
         for (TypeConstraint constraint : this.constraints) {
             constraint.collectTo(constraints);
         }

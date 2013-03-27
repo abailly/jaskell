@@ -3,12 +3,10 @@ package fr.lifl.jaskell.compiler.types;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author bailly
- * @version $Id: TypeSubstitution.java 1153 2005-11-24 20:47:55Z nono $
  */
 public class TypeSubstitution implements TypeVisitor<Type> {
 
@@ -27,12 +25,11 @@ public class TypeSubstitution implements TypeVisitor<Type> {
      * occuring in t
      *
      * @param t the Type to substitute
-     * @return a new Type whose all occurences of mapping in m
+     * @return a new Type whose all occurrences of mapping in m
      *         have been replaced
      */
     public Type substitute(Type t) {
-        Type ret = t.visit(this);
-        return ret;
+        return t.visit(this);
     }
 
     public Type visit(TypeVariable t) {

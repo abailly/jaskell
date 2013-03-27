@@ -1,25 +1,25 @@
 package fr.lifl.jaskell.compiler.types;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-import java.util.List;
+import java.util.Set;
 
 public class TypeConstraintsBuilder {
     
-    final List<TypeConstraint> constraints = Lists.newArrayList();
+    final Set<TypeConstraint> constraints = Sets.newHashSet();
 
     public TypeConstraintsBuilder collectConstraints(Type type) {
-        type.visit(new Visitors.ConstantTypeVisitor<List<TypeConstraint>>(constraints) {
+        type.visit(new Visitors.ConstantTypeVisitor<Set<TypeConstraint>>(constraints) {
 
             @Override
-            public List<TypeConstraint> visit(TypeApplication typeApplication) {
+            public Set<TypeConstraint> visit(TypeApplication typeApplication) {
                 typeApplication.getRange().visit(this);
                 typeApplication.getDomain().visit(this);
                 return constraints;
             }
 
             @Override
-            public List<TypeConstraint> visit(ConstrainedType constrainedType) {
+            public Set<TypeConstraint> visit(ConstrainedType constrainedType) {
                 constraints.add(constrainedType.getTypeConstraint());
                 return constraints;
             }
@@ -34,14 +34,14 @@ public class TypeConstraintsBuilder {
 
     public TypeConstraint build() {
         if(constraints.size() == 1) {
-            return constraints.get(0);
+            return constraints.iterator().next();
         }
 
         return new TypeConstraints(flatten(constraints));
     }
 
-    private List<TypeConstraint> flatten(List<TypeConstraint> constraints) {
-        List<TypeConstraint> flattened = Lists.newArrayList();
+    private Set<TypeConstraint> flatten(Set<TypeConstraint> constraints) {
+        Set<TypeConstraint> flattened = Sets.newHashSet();
         for (TypeConstraint constraint : constraints) {
             constraint.collectTo(flattened);
         }

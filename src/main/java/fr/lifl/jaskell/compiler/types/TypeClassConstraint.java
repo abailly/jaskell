@@ -1,6 +1,6 @@
 package fr.lifl.jaskell.compiler.types;
 
-import java.util.List;
+import java.util.Set;
 
 public class TypeClassConstraint implements TypeConstraint {
     private final TypeClass typeClass;
@@ -17,7 +17,7 @@ public class TypeClassConstraint implements TypeConstraint {
     }
 
     @Override
-    public void collectTo(List<TypeConstraint> constraints) {
+    public void collectTo(Set<TypeConstraint> constraints) {
         constraints.add(this);
     }
 
