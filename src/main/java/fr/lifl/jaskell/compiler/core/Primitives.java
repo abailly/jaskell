@@ -153,43 +153,10 @@ public interface Primitives {
     /** primitive data definitions */
     DataDefinition DATA_LIST = new PrimitiveData("([])", Types.makeApplication(LIST, VAR_A), JList.class, Module.PRELUDE);
 
-    static {
-        DATA_LIST = new PrimitiveData("([])", Types.makeApplication(LIST, VAR_A), JList.class, Module.PRELUDE);
-    }
-
-    static {
-        DATA_LIST = new PrimitiveData("([])", Types.makeApplication(LIST, VAR_A), JList.class, Module.PRELUDE);
-    }
-
-    static {
-        DATA_LIST = new PrimitiveData("([])", Types.makeApplication(LIST, VAR_A), JList.class, Module.PRELUDE);
-    }
-
     ConstructorDefinition CONS = new PrimitiveConstructor("(:)", DATA_LIST, new Type[] {
             VAR_A,
             Types.makeApplication(LIST, VAR_A)
         }, _3a.class, Module.PRELUDE);
-
-    static {
-        CONS = new PrimitiveConstructor("(:)", DATA_LIST, new Type[] {
-                VAR_A,
-                Types.makeApplication(LIST, VAR_A)
-            }, _3a.class, Module.PRELUDE);
-    }
-
-    static {
-        CONS = new PrimitiveConstructor("(:)", DATA_LIST, new Type[] {
-                VAR_A,
-                Types.makeApplication(LIST, VAR_A)
-            }, _3a.class, Module.PRELUDE);
-    }
-
-    static {
-        CONS = new PrimitiveConstructor("(:)", DATA_LIST, new Type[] {
-                VAR_A,
-                Types.makeApplication(LIST, VAR_A)
-            }, _3a.class, Module.PRELUDE);
-    }
 
     ConstructorDefinition NIL = new PrimitiveConstructor("([])", DATA_LIST, new Type[0], _5b_5d.class, Module.PRELUDE);
 
@@ -200,30 +167,6 @@ public interface Primitives {
 
     /** primitive functions */
     PrimitiveFunction ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
-
-    static {
-        ERROR = new PrimitiveFunction("error", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), null);
-    }
 
     PrimitiveFunction ADD_INT_INT = new PrimitiveFunction("(+)", Module.PRELUDE, INT_INT_INT, null);
 
@@ -269,55 +212,7 @@ public interface Primitives {
 
     PrimitiveFunction PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
 
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_ERROR = new PrimitiveFunction("primError", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, STRING), TypeFactory.freshBinding()), Prelude.class);
-    }
-
     PrimitiveFunction PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.makeApplication(Types.makeApplication(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.makeApplication(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
-
-    static {
-        PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
-    }
 
     /* primitive constructors */
     //    public static final PrimitiveData LIST_DATA =
