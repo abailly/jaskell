@@ -498,7 +498,6 @@ atype:  gtycon { $$ = $1; }
 comma_types: comma_types COMMA type | ;
 
 gtycon: tycon { $$ = new TypeExpression(TypeFactory.makeTycon(((Constructor)$1).getName())); }
-/* | tycon { $$ = new TypeExpression(TypeFactory.makeTycon(((Constructor)$1).getName())); } */
 | L_PAREN R_PAREN { $$ = new TypeExpression(Primitives.UNIT); } 
 | L_BRACKET R_BRACKET  { $$ = new TypeExpression(Primitives.LIST); }
 | L_PAREN FUNOP R_PAREN  { $$ = new TypeExpression(Primitives.FUNCTION); }

@@ -1,23 +1,22 @@
 /**
  *  Copyright Murex S.A.S., 2003-2013. All Rights Reserved.
- * 
+ *
  *  This software program is proprietary and confidential to Murex S.A.S and its affiliates ("Murex") and, without limiting the generality of the foregoing reservation of rights, shall not be accessed, used, reproduced or distributed without the
  *  express prior written consent of Murex and subject to the applicable Murex licensing terms. Any modification or removal of this copyright notice is expressly prohibited.
  */
 package fr.lifl.jaskell.compiler.bytecode;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.lifl.jaskell.compiler.core.PrimitiveFunction;
 import fr.lifl.jaskell.compiler.core.Primitives;
-
 import oqube.bytes.ClassFile;
 import oqube.bytes.TypeHelper;
 import oqube.bytes.instructions.Instruction;
 import oqube.bytes.instructions.Sequence;
 import oqube.bytes.pool.ClassData;
 import oqube.bytes.pool.MethodRefData;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /*
@@ -108,7 +107,7 @@ class StaticMethodPrimitiveCode implements PrimitiveCode {
 }
 
 /**
- * @author  abailly
+ * @author abailly
  * @version $Id: PrimitivesCodeGenerator.java 1207 2006-05-26 08:55:33Z nono $
  */
 public class PrimitivesCodeGenerator {
@@ -160,22 +159,21 @@ public class PrimitivesCodeGenerator {
             }
         };
 
-        PrimitiveFunction pf = Primitives.ERROR;
-        primitives.put(pf, error);
+        primitives.put(Primitives.ERROR, error);
 
-        //              primitives.put(
-        //                                      Primitives.NIL,
-        //                                      new StaticMethodPrimitiveCode(
-        //                                      "fr/lifl/jaskell//runtime/types/JList",
-        //                                              "_nil",
-        //                                              "()Ljaskell/runtime/types/JList;"));
-        //              primitives.put(
-        //                                      Primitives.CONS,
-        //                                      new StaticMethodPrimitiveCode(
-        //                                      "fr/lifl/jaskell//runtime/types/JList",
-        //                                              "_cons",
-        //                                              "(Ljaskell/runtime/types/JObject;Ljaskell/runtime/types/JList;)Ljaskell/runtime/types/JList;"));
-        //
+        primitives.put(
+                Primitives.NIL,
+                new StaticMethodPrimitiveCode(
+                        "fr/lifl/jaskell//runtime/types/JList",
+                        "_5b_5d",
+                        "()Lfr/lifl/jaskell/runtime/types/JList;"));
+        primitives.put(
+                Primitives.CONS,
+                new StaticMethodPrimitiveCode(
+                        "fr/lifl/jaskell//runtime/types/JList",
+                        "_3a",
+                        "(Lfr/lifl/jaskell/runtime/types/JObject;Lfr/lifl/jaskell/runtime/types/JList;)Lfr/lifl/jaskell/runtime/types/JList;"));
+
     }
 
     //~ ----------------------------------------------------------------------------------------------------------------
@@ -186,9 +184,8 @@ public class PrimitivesCodeGenerator {
      * Method getCode. Returns code sequence associated with given primitive function. The function must have been
      * registered before using <code>registerPrimitiveCode()</code>.
      *
-     * @param  pf
-     * @param  cf classFile where code is emitted
-     *
+     * @param pf
+     * @param cf classFile where code is emitted
      * @return Instruction
      */
     public static Instruction emitCode(PrimitiveFunction pf, ClassFile cf) {
