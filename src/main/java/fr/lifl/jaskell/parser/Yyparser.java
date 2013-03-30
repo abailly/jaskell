@@ -857,7 +857,7 @@ public class Yyparser implements fr.lifl.parsing.Parser {
         return module;
     }
 
-    public List getModules() {
+    public List<Module> getModules() {
         return modules;
     }
 

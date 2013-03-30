@@ -230,6 +230,16 @@ public class Prelude {
         return Integer.MAX_VALUE;
     }
 
+    public static JObject putStrLn(JObject jObject) {
+        System.out.print(jObject);
+        return null;
+    }
+    
+    public static JObject primPutInt(int i) {
+        System.out.print(i);
+        return null;
+    }
+    
     public static JObject error(String msg) {
         return primError(msg);
     }
@@ -276,5 +286,7 @@ public class Prelude {
     private static JObject primError(String msg) {
         throw new JaskellError(msg);
     }
+    
+    
 
 }

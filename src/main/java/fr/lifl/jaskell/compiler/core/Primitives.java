@@ -204,6 +204,8 @@ public interface Primitives {
 
     PrimitiveFunction PRIM_PUT_INT = new PrimitiveFunction("primPutInt", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, INT), TypeFactory.freshBinding()), Prelude.class);
 
+    PrimitiveFunction PRIM_PUT_STR_LN = new PrimitiveFunction("putStrLn", Module.PRELUDE, Types.apply(Types.apply(FUNCTION, TypeFactory.freshBinding()), TypeFactory.freshBinding()), Prelude.class);
+
     /* primitive constructors */
     //    public static final PrimitiveData LIST_DATA =
     //            new PrimitiveData("([])", new TypeApplication(LIST,VAR_A),

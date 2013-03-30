@@ -24,7 +24,7 @@ public class ParserTest extends TestCase {
 	 *	length x:xs = length xs + 1
 	 */
 	public void testLength() {
-		String text = "{ length [] = 0 ;" + "length (x : xs) = length xs + 1}";
+		String text = "module Toto where { length [] = 0 ;" + "length (x : xs) = length xs + 1}";
 		StringReader sr = new StringReader(text);
 		Yyparser p = new Yyparser();
 		p.parse(sr);
@@ -39,7 +39,7 @@ public class ParserTest extends TestCase {
 	 */
 	public void testMappairs() {
 		String text =
-			"{ length [] = 0 ;"
+			"module Main where { length [] = 0 ;"
 				+ "length (x : xs) = length xs + 1;"
 				+ "	mappairs f [] ys = [] ;"
 				+ " mappairs f (x:xs) [] = [];"
@@ -52,7 +52,7 @@ public class ParserTest extends TestCase {
 
 	public void testEmptyClass() {
 		String text =
-			"{ class Functor f where { fmap :: (a-> b) -> f a -> f b }  }";
+			"module Main where { class Functor f where { fmap :: (a-> b) -> f a -> f b }  }";
 		StringReader sr = new StringReader(text);
 		Yyparser p = new Yyparser(true);
 		p.parse(sr);
@@ -61,7 +61,7 @@ public class ParserTest extends TestCase {
 	
 	public void testMonadClass() {
 		String text =
-			"{ class Monad m where { "+
+			"module Main where { class Monad m where { "+
 			"  (>>=) :: m a -> (a-> m b) -> m b ;" +
 			"  (>>) :: m a -> m b -> m b; " +   
 			"  return :: m -> m a ;" +
