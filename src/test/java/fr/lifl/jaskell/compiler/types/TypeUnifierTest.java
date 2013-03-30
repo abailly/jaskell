@@ -8,7 +8,6 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 import static fr.lifl.jaskell.compiler.core.Primitives.BOOL;
 import static fr.lifl.jaskell.compiler.types.Types.*;
-import static fr.lifl.jaskell.compiler.types.Types.apply;
 import static org.fest.assertions.Assertions.assertThat;
 
 public class TypeUnifierTest {

@@ -192,7 +192,6 @@ public class CodeGeneratorTest extends TestCase {
         m.visit(gen);
         ClassFileWriter writer = new ClassFileWriter("bin");
         BytecodeGenerator.cleanupClassFiles(writer);
-        Type2Class.cleanupClassFiles(writer);
     }
 
     //      public void testMax() throws Exception {

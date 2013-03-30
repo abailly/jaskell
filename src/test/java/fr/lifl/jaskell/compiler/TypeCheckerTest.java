@@ -122,9 +122,12 @@ public class TypeCheckerTest extends TestCase {
         ap6.addArgument(ap3);
         ap6.addArgument(ap4);
         a2.setBody(ap6);
+
+        System.err.println(a2);
         m.bind("f", a2);
         TypeChecker tc = new TypeChecker();
         m.visit(tc);
+        System.err.println(m.lookup("f").getType());
     }
 
     public void testAlternative() {
